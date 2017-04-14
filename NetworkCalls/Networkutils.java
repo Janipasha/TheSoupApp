@@ -25,24 +25,25 @@ import in.thesoup.thesoup.gsonConversion;
  */
 
 public class Networkutils {
-    private  Context mcontext;
+    private Context mcontext;
     private List<StoryData> mStoryData;
 
-    public Networkutils(Context context, List<StoryData> storyData){
+    public Networkutils(Context context, List<StoryData> storyData) {
         this.mcontext = context;
-        this.mStoryData= storyData;
+        this.mStoryData = storyData;
 
 
     }
 
-   public void getFeed(final StoryFeedAdapter feedAdapter) {
 
-      MySingleton singleton = MySingleton.getInstance(mcontext);
+    public void getFeed(final StoryFeedAdapter feedAdapter) {
 
-       //RequestQueue queue = singleton.getRequestQueue();
+        MySingleton singleton = MySingleton.getInstance(mcontext);
+
+        //RequestQueue queue = singleton.getRequestQueue();
 
 
-    JsonObjectRequest jsObjRequest = new JsonObjectRequest
+   JsonObjectRequest jsObjRequest = new JsonObjectRequest
             (Request.Method.GET, SoupContract.URL, null, new Response.Listener<JSONObject>() {
 
                 @Override
@@ -68,20 +69,10 @@ public class Networkutils {
                     // Auto-generated method stub
 
                 }
-            });/*{
-        @Override
-        public Map<String, String> getHeaders() throws AuthFailureError {
-            HashMap<String,String> headers = new HashMap<String, String>();
-            headers.put("TOKEN_KEY","TokenValue");
-            headers.put("USER_ID","userId");
-            return headers;
-        }
-        //nee to implement params for post request.
-    };*/
+            });
 
     singleton.addToRequestQueue(jsObjRequest);
 
-    //MySingleton.getInstance(this).addToRequestQueue(stringRequest);
 
 
 

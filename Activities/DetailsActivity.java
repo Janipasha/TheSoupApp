@@ -64,7 +64,7 @@ public class DetailsActivity extends AppCompatActivity {
         mSubstories = new ArrayList<>();
 
 
-        SingleStoryView = (RecyclerView) findViewById(R.id.list);
+        SingleStoryView = (RecyclerView) findViewById(R.id.list_story);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         SingleStoryView.setLayoutManager(layoutManager);
 
@@ -75,6 +75,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         nSingleStoryAdapter = new SingleStoryAdapter(mSubstories,StoryTitle,followStatus,DetailsActivity.this);
         networkutils.getSingleStory(nSingleStoryAdapter);
+
 
         SingleStoryView.setAdapter(nSingleStoryAdapter);
 

@@ -28,7 +28,6 @@ public class NetworkUtilsStory {
 
     private Context mcontext;
     private List<Substories> mSubstories;
-    private List<Substoryjsondata> mSubstoryjsondataList;
     private String Storytitle, followstatus;
 
 
@@ -57,11 +56,11 @@ public class NetworkUtilsStory {
 
 
 
-                        gsonConversion mpopulateUI = new gsonConversion();
+                        gsonConversion mpopulateUIStory = new gsonConversion();
 
-                        Log.i("gson",mpopulateUI.toString());
+                        Log.i("gson",mpopulateUIStory.toString());
 
-                        mpopulateUI.fillStoryUI(response,mSubstories,feedstoryAdapter,Storytitle,followstatus);
+                        mpopulateUIStory.fillStoryUI(response,mSubstories,feedstoryAdapter,Storytitle,followstatus);
 
 
 

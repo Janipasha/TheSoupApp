@@ -11,5 +11,5 @@ public class SoupContract {
     public static final String UNFOLLOWURL = "http://192.168.1.130/newsapp/api/onfollow";
     public static final String LOGINURL = "http://192.168.1.130/newsapp/api/fb_login";
     public static final String STORYURL = "https://api.myjson.com/bins/u4543";
-    public static final String URL = "https://api.myjson.com/bins/12g7kz";
+   public static final String URL = "https://api.myjson.com/bins/12g7kz";
 }

@@ -14,11 +14,13 @@ import android.widget.TextView;
 import com.facebook.AccessToken;
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import in.thesoup.thesoup.Activities.ArticlesActivity;
 import in.thesoup.thesoup.Activities.DetailsActivity;
 import in.thesoup.thesoup.Activities.LoginActivity;
 import in.thesoup.thesoup.GSONclasses.FeedGSON.StoryData;
@@ -30,8 +32,11 @@ import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Substories;
 
 import static android.R.attr.onClick;
 import static android.R.attr.start;
+import static android.R.attr.subtitleTextStyle;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 import static android.media.CamcorderProfile.get;
+import static in.thesoup.thesoup.R.id.month;
+import static in.thesoup.thesoup.R.layout.story;
 
 /**
  * Created by Jani on 12-04-2017.
@@ -45,6 +50,8 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private Context mcontext;
     private String storyTitle;
     private String followstatus;
+    private String StoryTitle = "";
+
     // private List<Substories> mSubstories;
 
 
@@ -105,7 +112,13 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(mcontext, Articles.class);
+            int nposition = getAdapterPosition();
+            List<Articles> mArticles = substories.get(nposition).getArticles();
+
+
+            Intent intent = new Intent(mcontext, ArticlesActivity.class);
+
+            intent.putExtra("ARTICLELIST",(Serializable)mArticles);
             //Todo: implement putextra
             mcontext.startActivity(intent);
 
@@ -120,8 +133,8 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public HeaderViewHolder(View itemView) {
             super(itemView);
 
-            Storytitle = (TextView) itemView.findViewById(R.id.substory_title_story);
-            followbutton = (Button) itemView.findViewById(R.id.followbutton_story);
+            Storytitle = (TextView) itemView.findViewById(R.id.story_title_story_header);
+            followbutton = (Button) itemView.findViewById(R.id.followbutton_story_header);
 
             followbutton.setOnClickListener(this);
 
@@ -165,7 +178,7 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_ITEM) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.getstorydetails, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.story, parent, false);
             return new StoryViewHolder(view);
         } else if (viewType == TYPE_HEADER) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.storypage_header, parent, false);
@@ -180,10 +193,16 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
 
         final Substories mSubstories = substories.get(position);
-        String StoryTitle = storyTitle;
+        StoryTitle = storyTitle;
         String Time = mSubstories.getTime();
         String substoryTitle = mSubstories.getSubstoryName();
         int NumberofArticles = mSubstories.getNumberofArticles();
+        String SubstoryImage = mSubstories.getSubstoryImageURL();
+
+        Log.i("SubstoryImage",SubstoryImage);
+        Log.i("Time",Time);
+        Log.i("StoryTitle",StoryTitle);
+        Log.i("substoryTitle", substoryTitle);
 
         String month = null;
         try {
@@ -213,12 +232,14 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         if (holder instanceof HeaderViewHolder) {
             ((HeaderViewHolder) holder).Storytitle.setText(StoryTitle);
+
         } else if (holder instanceof StoryViewHolder) {
             ((StoryViewHolder) holder).mNumber_of_articles.setText(String.valueOf(NumberofArticles) + " ARTICLES");
             ((StoryViewHolder) holder).mDate.setText(Date);
             ((StoryViewHolder) holder).mMonth.setText(month);
             ((StoryViewHolder) holder).mYear.setText(year);
             ((StoryViewHolder) holder).mSubstory.setText(substoryTitle);
+            Picasso.with(mcontext).load(SubstoryImage).into(((StoryViewHolder)holder).mImageView);
 
         }
 
@@ -226,7 +247,9 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemCount() {
-        return substories.size() + 1;
+
+                    return substories.size();
+
     }
 
     public String monthFomrat(String string) throws ParseException {

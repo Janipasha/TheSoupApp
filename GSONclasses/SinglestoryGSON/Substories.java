@@ -33,4 +33,12 @@ public class Substories {
         return articles.size();
 
     }
+
+    public List<Articles> getArticles(){
+        return articles;
+    }
+
+    public String getSubstoryImageURL(){
+        return top_article_image;
+    }
 }
