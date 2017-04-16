@@ -1,7 +1,9 @@
 package in.thesoup.thesoup.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,9 +24,12 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
+import in.thesoup.thesoup.PreferencesFbAuth.PrefUtil;
 import in.thesoup.thesoup.R;
 
 import static android.R.attr.data;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+import static com.facebook.internal.CallbackManagerImpl.RequestCodeOffset.Share;
 
 /**
  * Created by Jani on 11-04-2017.
@@ -46,9 +51,9 @@ public class LoginActivity extends AppCompatActivity {
 
         loginButton = (LoginButton) findViewById(R.id.login_button);
 
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("email", "public_profile"));
+        loginButton.setReadPermissions(Arrays.asList("email", "public_profile"));
 
-        LoginManager.getInstance().registerCallback(callbackmanager,
+        loginButton.registerCallback(callbackmanager,
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
@@ -73,11 +78,20 @@ public class LoginActivity extends AppCompatActivity {
                                                 String jsonresult = String.valueOf(json);
                                                 System.out.println("JSON Result" + jsonresult);
 
-                                                //String str_email = json.getString("email");
-                                                String str_id = json.getString("id");
-                                                String str_firstname = json.getString("first_name");
-                                                String str_lastname = json.getString("last_name");
 
+                                                String str_email = json.getString("email");
+                                               // String str_profileURL = "http://graph.facebook.com/"+userID+"/picture?type=large"
+                                                String str_id = json.getString("id");
+                                                 String str_firstname = json.getString("first_name");
+                                                String str_lastname = json.getString("last_name");
+                                                String str_picture = json.getString("picture");
+                                                Log.d("str_picture",str_picture);
+                                                PrefUtil User = new PrefUtil(LoginActivity.this);
+                                                User.saveFacebookUserInfo(str_firstname,str_lastname,str_email,str_picture);
+                                                SharedPreferences Pref = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+
+                                                String Value = Pref.getString("fb_first_name","");
+                                                Log.d("Value",Value);
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
