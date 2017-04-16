@@ -22,4 +22,7 @@ public class Articles implements Serializable {
     public String getArticletitle() {
         return title;
     }
+    public String getImageUrl(){return image_url;}
+    public String getSourceName(){return  source_name;}
+    public String getUrl(){return url;}
 }

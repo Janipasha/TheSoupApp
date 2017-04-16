@@ -36,11 +36,9 @@ import static android.R.attr.subtitleTextStyle;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 import static android.media.CamcorderProfile.get;
 import static in.thesoup.thesoup.R.id.month;
+import static in.thesoup.thesoup.R.id.year;
 import static in.thesoup.thesoup.R.layout.story;
 
-/**
- * Created by Jani on 12-04-2017.
- */
 
 public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -113,7 +111,7 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @Override
         public void onClick(View view) {
             int nposition = getAdapterPosition();
-            List<Articles> mArticles = substories.get(nposition).getArticles();
+            List<Articles> mArticles = substories.get(nposition-1).getArticles();
 
 
             Intent intent = new Intent(mcontext, ArticlesActivity.class);
@@ -188,52 +186,56 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         throw new RuntimeException("there is no type that matches the type " + viewType + " + make sure your using types correctly");
     }
 
+
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
 
-        final Substories mSubstories = substories.get(position);
-        StoryTitle = storyTitle;
-        String Time = mSubstories.getTime();
-        String substoryTitle = mSubstories.getSubstoryName();
-        int NumberofArticles = mSubstories.getNumberofArticles();
-        String SubstoryImage = mSubstories.getSubstoryImageURL();
 
-        Log.i("SubstoryImage",SubstoryImage);
-        Log.i("Time",Time);
-        Log.i("StoryTitle",StoryTitle);
-        Log.i("substoryTitle", substoryTitle);
-
-        String month = null;
-        try {
-            month = monthFomrat(Time);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            Log.d("Not valid time", Time);
-        }
-
-        Log.d("Month", month);
-
-
-        String Date = null;
-        try {
-            Date = DateFomrat(Time);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        String year = null;
-        try {
-            year = yearFomrat(Time);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
 
 
         if (holder instanceof HeaderViewHolder) {
+            StoryTitle = storyTitle;
             ((HeaderViewHolder) holder).Storytitle.setText(StoryTitle);
 
         } else if (holder instanceof StoryViewHolder) {
+
+            final Substories mSubstories = substories.get(position-1);
+
+            String Time = mSubstories.getTime();
+            String substoryTitle = mSubstories.getSubstoryName();
+            int NumberofArticles = mSubstories.getNumberofArticles();
+            String SubstoryImage = mSubstories.getSubstoryImageURL();
+
+            Log.i("SubstoryImage",SubstoryImage);
+            Log.i("Time",Time);
+            Log.i("StoryTitle",StoryTitle);
+            Log.i("substoryTitle", substoryTitle);
+
+            String month = null;
+            try {
+                month = monthFomrat(Time);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                Log.d("Not valid time", Time);
+            }
+
+            Log.d("Month", month);
+
+
+            String Date = null;
+            try {
+                Date = DateFomrat(Time);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            String year = null;
+            try {
+                year = yearFomrat(Time);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             ((StoryViewHolder) holder).mNumber_of_articles.setText(String.valueOf(NumberofArticles) + " ARTICLES");
             ((StoryViewHolder) holder).mDate.setText(Date);
             ((StoryViewHolder) holder).mMonth.setText(month);
@@ -248,7 +250,7 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemCount() {
 
-                    return substories.size();
+                    return substories.size()+1;
 
     }
 

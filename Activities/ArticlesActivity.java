@@ -4,10 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import in.thesoup.thesoup.Adapters.ArticlesAdapter;
 import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Articles;
 import in.thesoup.thesoup.R;
 import in.thesoup.thesoup.gsonConversion;
@@ -18,13 +22,15 @@ import in.thesoup.thesoup.gsonConversion;
 
 public class ArticlesActivity extends AppCompatActivity{
     private TextView mtextView;
-    private String mString;
+
     private List<Articles> mArticles;
+    private RecyclerView ArticlesView;
+    private ArticlesAdapter mArticlesAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.articles);
+        setContentView(R.layout.getarticles);
 
         Intent in = getIntent();
         mArticles =(List<Articles>) in.getSerializableExtra("ARTICLELIST");
@@ -32,11 +38,19 @@ public class ArticlesActivity extends AppCompatActivity{
         //gsonConversion articlelist = new gsonConversion();
         //articlelist.ArticleJson(mString,mArticles);
 
-        mtextView= (TextView)findViewById(R.id.article_text);
 
-        String articletitle = mArticles.get(0).getArticletitle();
+        ArticlesView = (RecyclerView) findViewById(R.id.list_articles);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+       ArticlesView.setLayoutManager(layoutManager);
 
-        mtextView.setText(articletitle);
+      ArticlesView.setHasFixedSize(true);
+
+        mArticlesAdapter = new ArticlesAdapter(mArticles,this);
+
+        ArticlesView.setAdapter(mArticlesAdapter);
+
+
+
 
 
     }
