@@ -29,12 +29,12 @@ public class PrefUtil {
 
     public String getToken() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getString("fb_access_token", null);
+        return prefs.getString("fb_token", null);
     }
 
     public String getPermissions() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getString("fb_granted_scope", null);
+        return prefs.getString("grantedScope", null);
     }
 
     public void clearToken() {
@@ -44,7 +44,17 @@ public class PrefUtil {
         editor.apply(); // This line is IMPORTANT !!!
     }
 
-    public void saveFacebookUserInfo(String first_name,String last_name, String email,String gender, String profileURL,String id,String age_range){
+    public void saveFacebookUserInfo(String first_name,
+                                     String last_name,
+                                     String email,
+                                     String gender,
+                                     String profileURL,
+                                     String id,
+                                     String age_min,
+                                     String age_max) {
+
+        Log.d("pref_use", age_min);
+        Log.d("pref_max",age_max);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor editor = prefs.edit();
 
@@ -53,10 +63,15 @@ public class PrefUtil {
         editor.putString("email_id", email);
         editor.putString("gender", gender);
         editor.putString("image_url", profileURL);
-        editor.putString("fb_id",id);
-        editor.putString("age_range",age_range);
+        editor.putString("fb_id", id);
+        editor.putString("age_min", age_min);
+        editor.putString("age_max", age_max);
+
         editor.apply(); // This line is IMPORTANT !!!
-        Log.d("MyApp", "Shared Name : "+first_name+"\nLast Name : "+last_name+"\nEmail : "+email/*"\nGender : "+gender**/+"\nProfile Pic : "+profileURL);
+        Log.d("MyApp", "Shared Name : " + first_name + "\nLast Name : " +
+                last_name + "\nEmail : " + email/*"\nGender : "+gender**/ + "\nProfile Pic : " +
+                "" + profileURL + "\n age_min:" + age_min);
+
     }
 
     public void getFacebookUserInfo(){
@@ -66,24 +81,24 @@ public class PrefUtil {
 
     public String getEmail(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getString("fb_email",null);
+        return prefs.getString("email_id",null);
     }
 
     public String getFirstname(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getString("fb_first_name",null);
+        return prefs.getString("first_name",null);
     }
 
 
     public String getLastname(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getString("fb_last_name",null);
+        return prefs.getString("last_name",null);
     }
 
 
     public String getGender(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getString("fb_gender",null);
+        return prefs.getString("gender",null);
     }
 
 
@@ -94,12 +109,19 @@ public class PrefUtil {
 
     public String getPictureUrl(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getString("fb_profileURL",null);}
+        return prefs.getString("image_url",null);}
 
-    public String getAgeRange(){
+    public String getAgeMin(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getString("fb_age_range",null);
+        return prefs.getString("age_min",null);
     }
+
+    public String getAgeMax(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        return prefs.getString("age_max",null);
+    }
+
+
 
 
 

@@ -108,10 +108,13 @@ public class LoginActivity extends AppCompatActivity {
                                         params.put("first_name",prefUtil.getFirstname());
                                         params.put("last_name",prefUtil.getLastname());
                                         params.put("email_id",prefUtil.getEmail());
-                                        params.put("age_range",prefUtil.getAgeRange());
+                                        params.put("age_min",prefUtil.getAgeMin());
                                         params.put("gender",prefUtil.getGender());
+                                        params.put("age_max",prefUtil.getAgeMax());
                                         //params.put("dob",);//send dob as null for future
-                                        params.put("image-url",prefUtil.getPictureUrl());
+                                        params.put("image_url",prefUtil.getPictureUrl());
+
+                                       // Log.d("prefUtilemail",prefUtil.getEmail());
 
                                         for (String name: params.keySet()){
 
@@ -126,14 +129,14 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-                                        //NetworkUtilsLogin loginRequest = new NetworkUtilsLogin(LoginActivity.this,params);
+                                        NetworkUtilsLogin loginRequest = new NetworkUtilsLogin(LoginActivity.this,params);
 
-                                        //loginRequest.loginvolleyRequest();
+                                        loginRequest.loginvolleyRequest();
 
 
-                                        //NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(LoginActivity.this,StoryId,params);
+                                        NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(LoginActivity.this,StoryId,params);
 
-                                        //followrequest.followRequest();
+                                        followrequest.followRequest();
 
 
 
@@ -205,13 +208,29 @@ public class LoginActivity extends AppCompatActivity {
 
             Log.d("Bundle",bundle.toString());
 
+            String age_min = object.getJSONObject("age_range").getString("min");
+            Log.d("age min1 ",age_min);
+
+            JSONObject agerange = object.getJSONObject("age_range");
+            String age_max= null;
+            if(agerange.has("max")){
+            age_max = object.getJSONObject("age_range").getString("max");}
+
+            //Log.d("age max",age_max);
+
 
             prefUtil.saveFacebookUserInfo(object.getString("first_name"),
-                    object.getString("last_name"),object.getString("email"),
-                    object.getString("gender"), profile_pic.toString(),object.getString("id"),object.getString("age_range"));
+                    object.getString("last_name"),
+                    object.getString("email"),
+                    object.getString("gender"),
+                    profile_pic.toString(),
+                    object.getString("id"),
+                    age_min,age_max);
+
+
 
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-            Log.d("Shared Preference ",pref.getString("email","") + " "+ pref.getString("first_name",""));
+            Log.d("Shared Preference ",pref.getString("email","") + " "+ pref.getString("first_name","")+" "+pref.getString("age_min"," "));
 
         } catch (Exception e) {
             Log.d("BUNDLE Exception : ",e.toString());

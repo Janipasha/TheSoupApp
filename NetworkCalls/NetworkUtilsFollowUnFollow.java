@@ -93,6 +93,8 @@ public class NetworkUtilsFollowUnFollow {
             //nee to implement params for post request.
         };
 
+        singleton.addToRequestQueue(jsObjRequest);
+
         return result;
 
 
