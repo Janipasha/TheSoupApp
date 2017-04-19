@@ -3,14 +3,21 @@ package in.thesoup.thesoup.NetworkCalls;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import in.thesoup.thesoup.Adapters.SingleStoryAdapter;
 import in.thesoup.thesoup.Adapters.StoryFeedAdapter;
@@ -28,45 +35,69 @@ public class NetworkUtilsStory {
 
     private Context mcontext;
     private List<Substories> mSubstories;
-    private String Storytitle, followstatus;
+    private String Storytitle, followstatus,StoryId;
+    private final String BOUNDARY= "whatsnonega";
 
 
-    public NetworkUtilsStory(Context context, List<Substories> substories,String Storytitle, String followstatus){
+
+
+
+    public NetworkUtilsStory(Context context, List<Substories> substories,String Storytitle, String followstatus,String StoryId){
         this.mcontext = context;
         this.mSubstories= substories;
         this.Storytitle = Storytitle;
         this.followstatus =followstatus;
+        this.StoryId = StoryId;
 
     }
 
+    private String createPostBody(Map<String, String> params) {
+        StringBuilder sbPost = new StringBuilder();
+        for (String key : params.keySet()) {
+            if (params.get(key) != null) {
+                sbPost.append("\r\n" + "--" + BOUNDARY + "\r\n");
+                sbPost.append("Content-Disposition: form-data; name=\"" + key + "\"" + "\r\n\r\n");
+                sbPost.append(params.get(key));
+            }
+        }
 
-    public void getSingleStory(final SingleStoryAdapter feedstoryAdapter) {
+        return sbPost.toString();
+    }
+
+
+    public void getSingleStory(final SingleStoryAdapter feedstoryAdapter) throws JSONException {
 
         MySingleton singleton = MySingleton.getInstance(mcontext);
+       // String Url = SoupContract.STORYURL +StoryId;
+
+
+         HashMap<String,String> storyparam = new HashMap<>();
+        storyparam.put("story_id", StoryId);
+
+
+
+
+
 
         //RequestQueue queue = singleton.getRequestQueue();
 
 
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, SoupContract.STORYURL, null, new Response.Listener<JSONObject>() {
+                (Request.Method.POST, SoupContract.STORYURL, null, new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
                         Log.i("akunamatata", response.toString());
 
 
-
                         gsonConversion mpopulateUIStory = new gsonConversion();
 
-                        Log.i("gson",mpopulateUIStory.toString());
+                        Log.i("gson", mpopulateUIStory.toString());
 
-                        mpopulateUIStory.fillStoryUI(response,mSubstories,feedstoryAdapter,Storytitle,followstatus);
-
-
+                        mpopulateUIStory.fillStoryUI(response, mSubstories, feedstoryAdapter, Storytitle, followstatus);
 
 
                     }
-
 
 
                 }, new Response.ErrorListener() {
@@ -76,16 +107,34 @@ public class NetworkUtilsStory {
                         // Auto-generated method stub
 
                     }
-                });/*{
-        @Override
-        public Map<String, String> getHeaders() throws AuthFailureError {
-            HashMap<String,String> headers = new HashMap<String, String>();
-            headers.put("TOKEN_KEY","TokenValue");
-            headers.put("USER_ID","userId");
-            return headers;
-        }
-        //nee to implement params for post request.
-    };*/
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String,String> headerParam = new HashMap<>();
+                headerParam.put("Content-Type","multipart/form-data;boundary="+BOUNDARY+";");
+                return headerParam;
+            }
+
+            @Override
+            public byte[] getBody() {
+                HashMap<String,String> Params = new HashMap<>();
+                Params.put("story_id", StoryId);
+                String postBody = createPostBody(Params);
+
+                return postBody.getBytes();
+            }
+        };/* {
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                //params.put("auth_token", "fa5cfb2eb02b18825ff4d94b81144023");
+                params.put("story_id", StoryId);
+                return params;
+            }
+
+        };*/
+            //nee to implement params for post request.
+
 
         singleton.addToRequestQueue(jsObjRequest);
 

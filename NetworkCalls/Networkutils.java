@@ -1,6 +1,8 @@
 package in.thesoup.thesoup.NetworkCalls;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -24,11 +26,11 @@ import in.thesoup.thesoup.gsonConversion;
  * Created by Jani on 06-04-2017.
  */
 
-public class Networkutils {
+public class NetworkUtils {
     private Context mcontext;
     private List<StoryData> mStoryData;
 
-    public Networkutils(Context context, List<StoryData> storyData) {
+    public NetworkUtils(Context context, List<StoryData> storyData) {
         this.mcontext = context;
         this.mStoryData = storyData;
 
@@ -71,6 +73,7 @@ public class Networkutils {
                 }
             });
 
+
     singleton.addToRequestQueue(jsObjRequest);
 
 
@@ -78,87 +81,8 @@ public class Networkutils {
 
 }
 
-    public void followrequest(String storyId){
-
-        MySingleton singleton = MySingleton.getInstance(mcontext);
-
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, SoupContract.FOLLOWURL, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i("followjsonresponse", response.toString());
 
 
-
-
-                    }
-
-
-                    //mEarthquakedatajsonclass = red;
-
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // Auto-generated method stub
-
-                    }
-                }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String,String> headers = new HashMap<String, String>();
-                headers.put("TOKEN_KEY","TokenValue");
-                headers.put("USER_ID","userId");
-                return headers;
-            }
-            //nee to implement params for post request.
-        };
-
-
-
-
-    }
-
-    public void loginvolleyRequest(){
-
-        MySingleton singleton = MySingleton.getInstance(mcontext);
-
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, SoupContract.FOLLOWURL, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i("followjsonresponse", response.toString());
-
-
-
-
-                    }
-
-
-
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-
-                    }
-                }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String,String> headers = new HashMap<String, String>();
-                headers.put("TOKEN_KEY","TokenValue");
-                headers.put("USER_ID","userId");
-                return headers;
-            }
-            //TODO: nee to implement params for post request.
-        };
-
-
-
-    }
 
 
 }

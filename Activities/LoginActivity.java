@@ -29,13 +29,20 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import in.thesoup.thesoup.NetworkCalls.NetworkUtilsFollowUnFollow;
+import in.thesoup.thesoup.NetworkCalls.NetworkUtilsLogin;
 import in.thesoup.thesoup.PreferencesFbAuth.PrefUtil;
 import in.thesoup.thesoup.R;
 
 import static android.R.attr.data;
+import static android.R.attr.name;
+import static android.R.attr.value;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 import static com.facebook.internal.CallbackManagerImpl.RequestCodeOffset.Share;
 
 /**
@@ -47,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackmanager;
     private LoginButton loginButton;
     PrefUtil prefUtil;
+    private String StoryId;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +62,10 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.loginpage);
+
+        Bundle extras = getIntent().getExtras();
+        StoryId = extras.getString("story_id","");
+
         prefUtil = new PrefUtil(LoginActivity.this);
 
         callbackmanager = CallbackManager.Factory.create();
@@ -67,61 +79,82 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
 
+                        String getScopes = loginResult.getAccessToken().getPermissions().toString();
+                        Log.d("Scopes",getScopes);
+
+
+
+
+
 
                         System.out.println("Success");
                         Log.d("Acess Token",loginResult.getAccessToken().getToken().toString());
+
+                        String accessToken = loginResult.getAccessToken().getToken();
+                        prefUtil.saveAccessTokenPermissions(accessToken,getScopes);
 
                         GraphRequest request= GraphRequest.newMeRequest(
                                 loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                                     @Override
                                     public void onCompleted(JSONObject jsonobject, GraphResponse response) {
 
-                                        Bundle facebookData = getFacebookData(jsonobject);
+                                       Bundle facebookData = getFacebookData(jsonobject);
 
-                                        try {
-                                            String email = jsonobject.getString("email");
-                                            Log.d("Email",email);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
+
+                                       HashMap<String,String> params = new HashMap<>();
+                                        params.put("fb_token",prefUtil.getToken());
+                                        params.put("fb_id",prefUtil.getId());
+                                        params.put("grantedScopes",prefUtil.getPermissions());
+                                        params.put("first_name",prefUtil.getFirstname());
+                                        params.put("last_name",prefUtil.getLastname());
+                                        params.put("email_id",prefUtil.getEmail());
+                                        params.put("age_range",prefUtil.getAgeRange());
+                                        params.put("gender",prefUtil.getGender());
+                                        //params.put("dob",);//send dob as null for future
+                                        params.put("image-url",prefUtil.getPictureUrl());
+
+                                        for (String name: params.keySet()){
+
+                                            String key =name;
+
+
+                                            String value = params.get(key);
+                                            Log.d("param values",key + " " + value);
+
+
                                         }
-                                        Log.d("graphjson", response.toString());
-                                        Log.d("json", jsonobject.toString());
+
+
+
+                                        //NetworkUtilsLogin loginRequest = new NetworkUtilsLogin(LoginActivity.this,params);
+
+                                        //loginRequest.loginvolleyRequest();
+
+
+                                        //NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(LoginActivity.this,StoryId,params);
+
+                                        //followrequest.followRequest();
+
+
+
+
+
+                                        //TODO: Send acess token to server and store token in shared preference
+
+
 
                                         if (response.getError() != null) {
                                             // handle error
                                             System.out.println("ERROR");
                                         } else {
                                             System.out.println("Success");
-                                            /*try {
 
-                                         //       String jsonresult = String.valueOf(json);
-                                           //     System.out.println("JSON Result" + jsonresult);
-
-
-                                                String str_email = json.getString("email");
-                                               // String str_profileURL = "http://graph.facebook.com/"+userID+"/picture?type=large"
-                                                String str_id = json.getString("id");
-                                                 String str_firstname = json.getString("first_name");
-                                                String str_lastname = json.getString("last_name");
-                                                String str_picture = json.getString("picture");
-                                                Log.d("str_picture",str_picture);
-                                                PrefUtil User = new PrefUtil(LoginActivity.this);
-                                                User.saveFacebookUserInfo(str_firstname,str_lastname,str_email,str_picture);
-                                                SharedPreferences Pref = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-
-                                                String Value = Pref.getString("fb_first_name","");
-                                                Log.d("Value",Value);
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }*/
                                         }
                                     }
 
                                 });
                         Bundle parameters = new Bundle();
-                        parameters.putString("fields", "id,first_name,last_name,email,gender");
+                        parameters.putString("fields", "id,first_name,last_name,email,gender,age_range");
                         request.setParameters(parameters);
                                 request.executeAsync();
                     }
@@ -170,10 +203,12 @@ public class LoginActivity extends AppCompatActivity {
             if (object.has("gender"))
                 bundle.putString("gender", object.getString("gender"));
 
+            Log.d("Bundle",bundle.toString());
+
 
             prefUtil.saveFacebookUserInfo(object.getString("first_name"),
                     object.getString("last_name"),object.getString("email"),
-                    object.getString("gender"), profile_pic.toString());
+                    object.getString("gender"), profile_pic.toString(),object.getString("id"),object.getString("age_range"));
 
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
             Log.d("Shared Preference ",pref.getString("email","") + " "+ pref.getString("first_name",""));
@@ -195,31 +230,3 @@ public class LoginActivity extends AppCompatActivity {
 
 }
 
- /* loginButton.registerCallback(callbackmanager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d("User ID: ",loginResult.getAccessToken().getUserId());
-                Log.d("Auth Token: " ,loginResult.getAccessToken().getToken());
-                Log.d("loginResult:",loginResult.toString());
-
-
-
-
-
-
-            }
-
-            @Override
-            public void onCancel() {
-
-
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-
-
-
-            }
-        });
-    }*/

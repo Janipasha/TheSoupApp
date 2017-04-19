@@ -21,7 +21,9 @@ import java.util.List;
 
 import in.thesoup.thesoup.Activities.DetailsActivity;
 import in.thesoup.thesoup.Activities.LoginActivity;
+import in.thesoup.thesoup.Activities.MainActivity;
 import in.thesoup.thesoup.GSONclasses.FeedGSON.StoryData;
+import in.thesoup.thesoup.NetworkCalls.NetworkUtilsFollowUnFollow;
 import in.thesoup.thesoup.R;
 
 import static com.google.gson.internal.bind.util.ISO8601Utils.format;
@@ -49,7 +51,6 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
         public TextView storyTitle, substoryTitle, date, month, year, numberOfArticles;
         public ImageView imageView;
         public Button mButton;
-
 
 
         public DataViewHolder(View itemView) {
@@ -91,16 +92,26 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
             } else if (view == mButton) {
                 String mfollowstatus = StoryDataList.get(mposition).getFollowStatus();
 
-                if (mfollowstatus == null || mfollowstatus.equals("0")) {
+                if (mfollowstatus.equals("") || mfollowstatus.equals("0")) {
 
                     if (AccessToken.getCurrentAccessToken() == null) {
 
                         Intent intent = new Intent(context, LoginActivity.class);
                         //TODO: let the user be shown following after sucess
-
+                        intent.putExtra("story_id", mString);
+                        //TODO: On sucess, change the follow text
                         context.startActivity(intent);
 
+                        MainActivity activity = (MainActivity) context;
+
+                        activity.demo(mString);
+
                     } else {
+
+                        //NetworkUtilsFollowUnFollow follow = new NetworkUtilsFollowUnFollow(context,mString);
+
+                        //TODO: If condition for return value
+
 
                         mButton.setText("Following");
 
@@ -109,7 +120,7 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
                     }
 
-                }else if (mfollowstatus.equals("1")) {
+                } else if (mfollowstatus.equals("1")) {
                     mButton.setText("Follow");
                     //TODO: unfollow request network call return and then change text
                 }
@@ -169,10 +180,12 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
         String ImageUrl;
 
-        if (mStoryData.getImageUrl() != null) {
-            ImageUrl = mStoryData.getImageUrl();
-        } else {
+        if (mStoryData.getImageUrl().isEmpty()) {
             ImageUrl = mStoryData.getArticleImageUrl();
+
+        } else {
+            ImageUrl = mStoryData.getImageUrl();
+
         }
 
         holder.storyTitle.setText(storytitle);

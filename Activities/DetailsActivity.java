@@ -8,29 +8,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.gson.Gson;
-
-import org.json.JSONObject;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import in.thesoup.thesoup.Adapters.SingleStoryAdapter;
-import in.thesoup.thesoup.Adapters.StoryFeedAdapter;
-import in.thesoup.thesoup.GSONclasses.FeedGSON.StoryData;
-import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.GetSingleStory;
 import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Substories;
-import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Substoryjsondata;
-import in.thesoup.thesoup.NetworkCalls.MySingleton;
 import in.thesoup.thesoup.NetworkCalls.NetworkUtilsStory;
-import in.thesoup.thesoup.NetworkCalls.Networkutils;
 import in.thesoup.thesoup.R;
-import in.thesoup.thesoup.SoupContract;
-import in.thesoup.thesoup.gsonConversion;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -44,7 +30,7 @@ public class DetailsActivity extends AppCompatActivity {
     //private List<Substoryjsondata> substoryjsondataList;
     private RecyclerView SingleStoryView;
     private SingleStoryAdapter nSingleStoryAdapter;
-    private String StoryTitle, followStatus;
+    private String StoryTitle, followStatus,StoryId;
 
 
 
@@ -52,6 +38,11 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.getstorydetails);
+
+        Bundle bundle = getIntent().getExtras();
+        StoryId = bundle.getString("story_id");
+
+        Log.d("StoryId",StoryId);
 
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
@@ -71,10 +62,14 @@ public class DetailsActivity extends AppCompatActivity {
         SingleStoryView.setHasFixedSize(true);
 
 
-        NetworkUtilsStory networkutils = new NetworkUtilsStory(DetailsActivity.this, mSubstories,StoryTitle,followStatus);
+        NetworkUtilsStory networkutils = new NetworkUtilsStory(DetailsActivity.this, mSubstories,StoryTitle,followStatus,StoryId);
 
         nSingleStoryAdapter = new SingleStoryAdapter(mSubstories,StoryTitle,followStatus,DetailsActivity.this);
-        networkutils.getSingleStory(nSingleStoryAdapter);
+        try {
+            networkutils.getSingleStory(nSingleStoryAdapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
 
         SingleStoryView.setAdapter(nSingleStoryAdapter);
