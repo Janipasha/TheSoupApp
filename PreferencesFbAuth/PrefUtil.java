@@ -26,6 +26,18 @@ public class PrefUtil {
         editor.apply(); // This line is IMPORTANT !!!
     }
 
+    public void saveGeneratedUserToken(String token) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("auth_token", token);
+    }
+
+    public String getGeneratedUserToken(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        return prefs.getString("auth_token", null);
+
+    }
+
 
     public String getToken() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
@@ -54,7 +66,7 @@ public class PrefUtil {
                                      String age_max) {
 
         Log.d("pref_use", age_min);
-        Log.d("pref_max",age_max);
+        //Log.d("pref_max",age_max);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor editor = prefs.edit();
 

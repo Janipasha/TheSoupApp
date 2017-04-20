@@ -23,13 +23,11 @@ import in.thesoup.thesoup.SoupContract;
 public class NetworkUtilsFollowUnFollow {
 
     private Context mcontext;
-    private String StoryId;
     private Map<String ,String> params;
     private final String BOUNDARY = "whatshitisthis";
 
-    public NetworkUtilsFollowUnFollow(Context context, String Storyid,Map<String,String> params) {
+    public NetworkUtilsFollowUnFollow(Context context,Map<String,String> params) {
         this.mcontext = context;
-        this.StoryId = Storyid;
         this.params = params;
 
     }

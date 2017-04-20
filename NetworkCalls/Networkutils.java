@@ -46,7 +46,7 @@ public class NetworkUtils {
 
 
    JsonObjectRequest jsObjRequest = new JsonObjectRequest
-            (Request.Method.GET, SoupContract.URL, null, new Response.Listener<JSONObject>() {
+            (Request.Method.POST, SoupContract.URL, null, new Response.Listener<JSONObject>() {
 
                 @Override
                 public void onResponse(JSONObject response) {

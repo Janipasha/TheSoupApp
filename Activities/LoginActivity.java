@@ -55,6 +55,8 @@ public class LoginActivity extends AppCompatActivity {
     private LoginButton loginButton;
     PrefUtil prefUtil;
     private String StoryId;
+    private HashMap<String,String> params;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         StoryId = extras.getString("story_id","");
+
 
         prefUtil = new PrefUtil(LoginActivity.this);
 
@@ -101,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                                        Bundle facebookData = getFacebookData(jsonobject);
 
 
-                                       HashMap<String,String> params = new HashMap<>();
+                                        params = new HashMap<>();
                                         params.put("fb_token",prefUtil.getToken());
                                         params.put("fb_id",prefUtil.getId());
                                         params.put("grantedScopes",prefUtil.getPermissions());
@@ -133,10 +136,22 @@ public class LoginActivity extends AppCompatActivity {
 
                                         loginRequest.loginvolleyRequest();
 
+                                        //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
 
-                                        NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(LoginActivity.this,StoryId,params);
+                                        //Log.d("prefmestorekiya",pref.getString("auth_token",null));
 
-                                        followrequest.followRequest();
+                                        //Log.d("token from pref",prefUtil.getGeneratedUserToken());
+
+                                       // Log.d("token",prefUtil.getGeneratedUserToken());
+
+                                        //System.out.print(prefUtil.getGeneratedUserToken());
+
+                                      //  Log.d("string array ",token.get(0));
+
+
+
+
+
 
 
 
@@ -178,6 +193,24 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
+
+    }
+
+    public void Demo(String token){
+        prefUtil.saveGeneratedUserToken(token);
+
+        params.put("auth_token",prefUtil.getGeneratedUserToken());
+        params.put("story_id",StoryId);
+
+
+
+        NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(LoginActivity.this,params);
+
+        int r= 0 ;
+
+        r= followrequest.followRequest();
+
+        System.out.print(r);
 
     }
 
@@ -229,8 +262,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-            Log.d("Shared Preference ",pref.getString("email","") + " "+ pref.getString("first_name","")+" "+pref.getString("age_min"," "));
+            //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+            //Log.d("Shared Preference ",pref.getString("email","") + " "+ pref.getString("first_name","")+" "+pref.getString("age_min"," "));
 
         } catch (Exception e) {
             Log.d("BUNDLE Exception : ",e.toString());
