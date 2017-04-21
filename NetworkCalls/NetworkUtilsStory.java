@@ -65,7 +65,7 @@ public class NetworkUtilsStory {
     }
 
 
-    public void getSingleStory(final SingleStoryAdapter feedstoryAdapter) throws JSONException {
+    public void getSingleStory() throws JSONException {
 
         MySingleton singleton = MySingleton.getInstance(mcontext);
        // String Url = SoupContract.STORYURL +StoryId;
@@ -94,7 +94,7 @@ public class NetworkUtilsStory {
 
                         Log.i("gson", mpopulateUIStory.toString());
 
-                        mpopulateUIStory.fillStoryUI(response, mSubstories, feedstoryAdapter, Storytitle, followstatus);
+                        mpopulateUIStory.fillStoryUI(response, mSubstories, Storytitle, followstatus,mcontext);
 
 
                     }

@@ -54,6 +54,9 @@ public class StoryData {
         return active;
     }
 
+    public void changeFollowStatus(String status){active = status;};
+
+
 
 }
 

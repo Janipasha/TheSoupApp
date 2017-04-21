@@ -38,7 +38,8 @@ public class NetworkUtils {
     }
 
 
-    public void getFeed(final StoryFeedAdapter feedAdapter) {
+
+    public void getFeed() {
 
         MySingleton singleton = MySingleton.getInstance(mcontext);
 
@@ -56,7 +57,7 @@ public class NetworkUtils {
 
                    gsonConversion mpopulateUI = new gsonConversion();
 
-                 mpopulateUI.fillUI(response,mStoryData,feedAdapter);
+                 mpopulateUI.fillUI(response,mStoryData,mcontext);
 
 
                 }
@@ -72,7 +73,6 @@ public class NetworkUtils {
 
                 }
             });
-
 
     singleton.addToRequestQueue(jsObjRequest);
 

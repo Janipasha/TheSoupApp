@@ -1,5 +1,6 @@
 package in.thesoup.thesoup;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -11,6 +12,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import in.thesoup.thesoup.Activities.DetailsActivity;
+import in.thesoup.thesoup.Activities.MainActivity;
 import in.thesoup.thesoup.Adapters.SingleStoryAdapter;
 import in.thesoup.thesoup.Adapters.StoryFeedAdapter;
 import in.thesoup.thesoup.GSONclasses.FeedGSON.GetStoryFeed;
@@ -32,7 +35,7 @@ public class gsonConversion {
     private Substoryjsondata mSubstoryjsonData;
     private String StoryTitle , followstatus;
 
-    public void fillUI(JSONObject jsonObject,List<StoryData> mListFromJson,StoryFeedAdapter feedAdapter){
+    public void fillUI(JSONObject jsonObject,List<StoryData> mListFromJson,Context context){
 
         mJsonObject = jsonObject;
 
@@ -44,11 +47,12 @@ public class gsonConversion {
             mListFromJson.add(red.getStoryDataList().get(i));
         }
 
-       feedAdapter.refreshData(mListFromJson);
+        MainActivity activity = (MainActivity) context;
+
+        activity.startAdapter(mListFromJson);
     }
 
-    public void fillStoryUI(JSONObject jsonObject,List<Substories> substories,
-                            SingleStoryAdapter mSingleStoryAdapter,String StoryTitle, String followstatus){
+    public void fillStoryUI(JSONObject jsonObject, List<Substories> substories, String StoryTitle, String followstatus, Context context){
 
         mJsonObject = jsonObject;
 
@@ -66,7 +70,11 @@ public class gsonConversion {
         Log.d("substories",substories.toString());
 
 
-      mSingleStoryAdapter.refreshData(substories,StoryTitle,followstatus);
+        DetailsActivity activity = (DetailsActivity) context;
+
+        activity.startAdapter(substories,StoryTitle);
+
+      //mSingleStoryAdapter.refreshData(substories,StoryTitle,followstatus);
 
 
 

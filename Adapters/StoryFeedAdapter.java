@@ -2,7 +2,10 @@ package in.thesoup.thesoup.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +20,7 @@ import com.squareup.picasso.Picasso;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import in.thesoup.thesoup.Activities.DetailsActivity;
@@ -36,6 +40,8 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
     private List<StoryData> StoryDataList;
     private Context context;
+    private int clickposition;
+    private String clickStoryId;
 
     public StoryFeedAdapter(List<StoryData> Datalist, Context context) {
         this.StoryDataList = Datalist;
@@ -80,56 +86,85 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
         @Override
         public void onClick(View view) {
 
+
+
             int mposition = getAdapterPosition();
+            String mfollowstatus = StoryDataList.get(mposition).getFollowStatus();
             String mString = StoryDataList.get(mposition).getStoryId();
 
             if (view == imageView || view == storyTitle) {
 
                 Intent intent = new Intent(context, DetailsActivity.class);
                 intent.putExtra("story_id", mString);
+                intent.putExtra("followstatus",mfollowstatus);
+
 
                 context.startActivity(intent);
             } else if (view == mButton) {
-                String mfollowstatus = StoryDataList.get(mposition).getFollowStatus();
+                clickposition = mposition;
+                clickStoryId = mString;
 
-                if (mfollowstatus.equals("") || mfollowstatus.equals("0")) {
-
-                    if (AccessToken.getCurrentAccessToken() == null) {
-
-                        Intent intent = new Intent(context, LoginActivity.class);
-                        //TODO: let the user be shown following after sucess
-                        intent.putExtra("story_id", mString);
-                        //TODO: On sucess, change the follow text
-                        context.startActivity(intent);
-
-                        MainActivity activity = (MainActivity) context;
-
-                        activity.demo(mString);
-
-                    } else {
-
-                        //NetworkUtilsFollowUnFollow follow = new NetworkUtilsFollowUnFollow(context,mString);
-
-                        //TODO: If condition for return value
-
-
-                        mButton.setText("Following");
-
-
-                        //TODO: server request and let him know following, pass on stories ID
-
-                    }
-
-                } else if (mfollowstatus.equals("1")) {
-                    mButton.setText("Follow");
-                    //TODO: unfollow request network call return and then change text
-                }
+                followstory();
             }
-
 
         }
 
     }
+
+    public void followstory() {
+
+        Log.d("follow worked", clickStoryId);
+        String mfollowstatus = StoryDataList.get(clickposition).getFollowStatus();
+
+        if (mfollowstatus.equals("") || mfollowstatus.equals("0")) {
+
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+
+            if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
+
+
+                MainActivity activity = (MainActivity) context;
+
+
+                activity.demo(clickStoryId);
+
+            } else {
+
+                //NetworkUtilsFollowUnFollow follow = new NetworkUtilsFollowUnFollow(context,mString);
+
+                HashMap<String, String> params = new HashMap<>();
+
+                params.put("auth_token", pref.getString("auth_token", null));
+                params.put("story_id", clickStoryId);
+
+                NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(context, params);
+                //followrequest.followRequest(clickposition);
+
+                followrequest.followRequest(clickposition);
+
+
+            }
+
+        } else if (mfollowstatus.equals("1")) {
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+            HashMap<String, String> params = new HashMap<>();
+
+            params.put("auth_token", pref.getString("auth_token", null));
+            params.put("story_id", clickStoryId);
+
+            NetworkUtilsFollowUnFollow unFollowrequest = new NetworkUtilsFollowUnFollow(context, params);
+
+            unFollowrequest.unFollowRequest(clickposition);
+
+
+
+
+            //TODO: unfollow request network call return and then change text
+        }
+    }
+
 
     @Override
     public StoryFeedAdapter.DataViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -151,6 +186,10 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
         String Num_of_articles = mStoryData.getNumArticle();
         String followstatus = mStoryData.getFollowStatus();
 
+        Log.d("follow",storytitle+followstatus);
+
+        // Log.d("followstatus",followstatus);
+
 
         String month = null;
         try {
@@ -160,7 +199,7 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
             Log.d("Not valid time", Time);
         }
 
-        Log.d("Month", month);
+        // Log.d("Month", month);
 
 
         String Date = null;
@@ -197,20 +236,11 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
         holder.year.setText(year);
         holder.numberOfArticles.setText(Num_of_articles + " ARTICLES ");
 
-        if (followstatus == "1") {
+        if (followstatus.equals("1")) {
             holder.mButton.setText("Following");
+        } else if (followstatus.equals("0")) {
+            holder.mButton.setText("Follow");
         }
-
-       /* holder.imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, DetailsActivity.class);
-                intent.putExtra("story_id",mStoryData.getStoryId());
-
-                context.startActivity(intent);
-
-            }
-        });*/
 
 
     }

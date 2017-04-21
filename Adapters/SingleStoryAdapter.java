@@ -2,7 +2,10 @@ package in.thesoup.thesoup.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,14 +21,17 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import in.thesoup.thesoup.Activities.ArticlesActivity;
 import in.thesoup.thesoup.Activities.DetailsActivity;
 import in.thesoup.thesoup.Activities.LoginActivity;
+import in.thesoup.thesoup.Activities.MainActivity;
 import in.thesoup.thesoup.GSONclasses.FeedGSON.StoryData;
 import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Articles;
 import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Substoryjsondata;
+import in.thesoup.thesoup.NetworkCalls.NetworkUtilsFollowUnFollow;
 import in.thesoup.thesoup.R;
 
 import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Substories;
@@ -49,20 +55,21 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private String storyTitle;
     private String followstatus;
     private String StoryTitle = "";
+    private int clickposition;
+    private String clickStoryId;
 
     // private List<Substories> mSubstories;
 
 
-    public SingleStoryAdapter(List<Substories> substories, String storyTitle, String followstatus, Context context) {
+    public SingleStoryAdapter(List<Substories> substories, String storyTitle, String followstatus, Context context,String StoryId) {
         this.substories = substories; //Check is this statement is valid
         this.mcontext = context;
         this.storyTitle = storyTitle;
         this.followstatus = followstatus;
+        this.clickStoryId = StoryId;
     }
 
-    public void refreshData(List<Substories> substories,String storyTitle,String followstatus) {
-        this.substories = substories;
-        this.storyTitle = storyTitle;
+    public void refreshData(String followstatus) {
         this.followstatus = followstatus;
         notifyDataSetChanged();
     }
@@ -96,6 +103,7 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             mDate = (TextView) itemView.findViewById(R.id.date_story);
             mMonth = (TextView) itemView.findViewById(R.id.month_story);
             mYear = (TextView) itemView.findViewById(R.id.year_story);
+
 
 
             mImageView.setOnClickListener(this);
@@ -142,35 +150,64 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @Override
         public void onClick(View view) {
 
-            int mposition = getAdapterPosition();
-            String mString = substories.get(mposition).getSubstoryId();
 
+            clickposition = getAdapterPosition();
 
-            String mfollowstatus = followstatus;
-
-            if (mfollowstatus == null || mfollowstatus.equals("0")) {
-
-                if (AccessToken.getCurrentAccessToken() == null) {
-
-                    Intent intent = new Intent(mcontext, LoginActivity.class);
-                    //TODO: let the user be shown following after sucess
-
-                    mcontext.startActivity(intent);
-                } else {
-                    followbutton.setText("Following");
-
-
-                    //TODO: server request and let him know following, pass on stories ID
-
-                }
-
-            } else if (mfollowstatus.equals("1")) {
-                followbutton.setText("Follow");
-
-                //TODO: unfollow request network call return and then change text
-            }
+            followstory();
 
         }
+    }
+
+    public void followstory() {
+
+        Log.d("follow worked", clickStoryId +"details");
+        String mfollowstatus = followstatus;
+
+        if (mfollowstatus.equals("") || mfollowstatus.equals("0")) {
+
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mcontext);
+
+
+            if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
+
+
+                DetailsActivity activity = (DetailsActivity) mcontext;
+
+                activity.demo(clickStoryId);
+
+            } else {
+
+                //NetworkUtilsFollowUnFollow follow = new NetworkUtilsFollowUnFollow(context,mString);
+
+                HashMap<String, String> params = new HashMap<>();
+
+                params.put("auth_token", pref.getString("auth_token", null));
+                params.put("story_id", clickStoryId);
+
+                NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(mcontext, params);
+                //followrequest.followRequest(clickposition);
+
+                followrequest.followRequest(clickposition);
+
+
+            }
+        }  else if (mfollowstatus.equals("1")) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mcontext);
+
+        HashMap<String, String> params = new HashMap<>();
+
+        params.put("auth_token", pref.getString("auth_token", null));
+        params.put("story_id", clickStoryId);
+
+        NetworkUtilsFollowUnFollow unFollowrequest = new NetworkUtilsFollowUnFollow(mcontext, params);
+
+        unFollowrequest.unFollowRequest(clickposition);
+
+
+
+
+        //TODO: unfollow request network call return and then change text
+    }
     }
 
     @Override
@@ -192,11 +229,18 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
 
 
-
-
         if (holder instanceof HeaderViewHolder) {
             StoryTitle = storyTitle;
             ((HeaderViewHolder) holder).Storytitle.setText(StoryTitle);
+
+            String nfollowstatus = followstatus;
+
+
+            if (nfollowstatus.equals("1")) {
+                ((HeaderViewHolder) holder).followbutton.setText("Following");
+            } else if (nfollowstatus.equals("0")) {
+                ((HeaderViewHolder) holder).followbutton.setText("Follow");
+            }
 
         } else if (holder instanceof StoryViewHolder) {
 

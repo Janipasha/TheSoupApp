@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -54,8 +55,9 @@ public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackmanager;
     private LoginButton loginButton;
     PrefUtil prefUtil;
-    private String StoryId;
-    private HashMap<String,String> params;
+    private String StoryId,activityId;
+    private HashMap<String, String> params;
+
 
 
     @Override
@@ -66,7 +68,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.loginpage);
 
         Bundle extras = getIntent().getExtras();
-        StoryId = extras.getString("story_id","");
+        StoryId = extras.getString("story_id", "");
+        activityId = extras.getString("activity","");
+
+
+       Log.d("activityId",activityId);
 
 
         prefUtil = new PrefUtil(LoginActivity.this);
@@ -83,82 +89,53 @@ public class LoginActivity extends AppCompatActivity {
                     public void onSuccess(LoginResult loginResult) {
 
                         String getScopes = loginResult.getAccessToken().getPermissions().toString();
-                        Log.d("Scopes",getScopes);
-
-
-
-
+                        Log.d("Scopes", getScopes);
 
 
                         System.out.println("Success");
-                        Log.d("Acess Token",loginResult.getAccessToken().getToken().toString());
+                        Log.d("Acess Token", loginResult.getAccessToken().getToken().toString());
 
                         String accessToken = loginResult.getAccessToken().getToken();
-                        prefUtil.saveAccessTokenPermissions(accessToken,getScopes);
+                        prefUtil.saveAccessTokenPermissions(accessToken, getScopes);
 
-                        GraphRequest request= GraphRequest.newMeRequest(
+                        GraphRequest request = GraphRequest.newMeRequest(
                                 loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                                     @Override
                                     public void onCompleted(JSONObject jsonobject, GraphResponse response) {
 
-                                       Bundle facebookData = getFacebookData(jsonobject);
+                                        Bundle facebookData = getFacebookData(jsonobject);
 
 
                                         params = new HashMap<>();
-                                        params.put("fb_token",prefUtil.getToken());
-                                        params.put("fb_id",prefUtil.getId());
-                                        params.put("grantedScopes",prefUtil.getPermissions());
-                                        params.put("first_name",prefUtil.getFirstname());
-                                        params.put("last_name",prefUtil.getLastname());
-                                        params.put("email_id",prefUtil.getEmail());
-                                        params.put("age_min",prefUtil.getAgeMin());
-                                        params.put("gender",prefUtil.getGender());
-                                        params.put("age_max",prefUtil.getAgeMax());
+                                        params.put("fb_token", prefUtil.getToken());
+                                        params.put("fb_id", prefUtil.getId());
+                                        params.put("grantedScopes", prefUtil.getPermissions());
+                                        params.put("first_name", prefUtil.getFirstname());
+                                        params.put("last_name", prefUtil.getLastname());
+                                        params.put("email_id", prefUtil.getEmail());
+                                        params.put("age_min", prefUtil.getAgeMin());
+                                        params.put("gender", prefUtil.getGender());
+                                        params.put("age_max", prefUtil.getAgeMax());
                                         //params.put("dob",);//send dob as null for future
-                                        params.put("image_url",prefUtil.getPictureUrl());
+                                        params.put("image_url", prefUtil.getPictureUrl());
 
-                                       // Log.d("prefUtilemail",prefUtil.getEmail());
+                                        // Log.d("prefUtilemail",prefUtil.getEmail());
 
-                                        for (String name: params.keySet()){
+                                        for (String name : params.keySet()) {
 
-                                            String key =name;
+                                            String key = name;
 
 
                                             String value = params.get(key);
-                                            Log.d("param values",key + " " + value);
+                                            Log.d("param values", key + " " + value);
 
 
                                         }
 
 
-
-                                        NetworkUtilsLogin loginRequest = new NetworkUtilsLogin(LoginActivity.this,params);
+                                        NetworkUtilsLogin loginRequest = new NetworkUtilsLogin(LoginActivity.this, params);
 
                                         loginRequest.loginvolleyRequest();
-
-                                        //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-
-                                        //Log.d("prefmestorekiya",pref.getString("auth_token",null));
-
-                                        //Log.d("token from pref",prefUtil.getGeneratedUserToken());
-
-                                       // Log.d("token",prefUtil.getGeneratedUserToken());
-
-                                        //System.out.print(prefUtil.getGeneratedUserToken());
-
-                                      //  Log.d("string array ",token.get(0));
-
-
-
-
-
-
-
-
-
-
-                                        //TODO: Send acess token to server and store token in shared preference
-
 
 
                                         if (response.getError() != null) {
@@ -174,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
                         Bundle parameters = new Bundle();
                         parameters.putString("fields", "id,first_name,last_name,email,gender,age_range");
                         request.setParameters(parameters);
-                                request.executeAsync();
+                        request.executeAsync();
                     }
 
 
@@ -191,26 +168,31 @@ public class LoginActivity extends AppCompatActivity {
                 });
 
 
+    }
 
+    public void Followpasson() {
+
+        params.put("story_id",StoryId);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        params.put("auth_token",pref.getString("auth_token",null));
+
+       NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(this,params);
+        followrequest.followRequest(1);//passed for the sake of it , no use
 
 
     }
 
-    public void Demo(String token){
-        prefUtil.saveGeneratedUserToken(token);
+    public void startActivityMD(String followstatus){
+        if(activityId.equals("0")) {
 
-        params.put("auth_token",prefUtil.getGeneratedUserToken());
-        params.put("story_id",StoryId);
-
-
-
-        NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(LoginActivity.this,params);
-
-        int r= 0 ;
-
-        r= followrequest.followRequest();
-
-        System.out.print(r);
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        }else if(activityId.equals("1")) {
+            Intent intent = new Intent(LoginActivity.this,DetailsActivity.class);
+            intent.putExtra("story_id",StoryId);
+            intent.putExtra("followstatus",followstatus);
+            startActivity(intent);
+        }
 
     }
 
@@ -239,15 +221,16 @@ public class LoginActivity extends AppCompatActivity {
             if (object.has("gender"))
                 bundle.putString("gender", object.getString("gender"));
 
-            Log.d("Bundle",bundle.toString());
+            Log.d("Bundle", bundle.toString());
 
             String age_min = object.getJSONObject("age_range").getString("min");
-            Log.d("age min1 ",age_min);
+            Log.d("age min1 ", age_min);
 
             JSONObject agerange = object.getJSONObject("age_range");
-            String age_max= null;
-            if(agerange.has("max")){
-            age_max = object.getJSONObject("age_range").getString("max");}
+            String age_max = null;
+            if (agerange.has("max")) {
+                age_max = object.getJSONObject("age_range").getString("max");
+            }
 
             //Log.d("age max",age_max);
 
@@ -258,20 +241,18 @@ public class LoginActivity extends AppCompatActivity {
                     object.getString("gender"),
                     profile_pic.toString(),
                     object.getString("id"),
-                    age_min,age_max);
-
+                    age_min, age_max);
 
 
             //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
             //Log.d("Shared Preference ",pref.getString("email","") + " "+ pref.getString("first_name","")+" "+pref.getString("age_min"," "));
 
         } catch (Exception e) {
-            Log.d("BUNDLE Exception : ",e.toString());
+            Log.d("BUNDLE Exception : ", e.toString());
         }
 
         return bundle;
     }
-
 
 
     @Override

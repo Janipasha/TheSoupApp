@@ -9,11 +9,15 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import in.thesoup.thesoup.Activities.DetailsActivity;
+import in.thesoup.thesoup.Activities.LoginActivity;
+import in.thesoup.thesoup.Activities.MainActivity;
 import in.thesoup.thesoup.SoupContract;
 
 /**
@@ -23,10 +27,10 @@ import in.thesoup.thesoup.SoupContract;
 public class NetworkUtilsFollowUnFollow {
 
     private Context mcontext;
-    private Map<String ,String> params;
+    private Map<String, String> params;
     private final String BOUNDARY = "whatshitisthis";
 
-    public NetworkUtilsFollowUnFollow(Context context,Map<String,String> params) {
+    public NetworkUtilsFollowUnFollow(Context context, Map<String, String> params) {
         this.mcontext = context;
         this.params = params;
 
@@ -45,9 +49,8 @@ public class NetworkUtilsFollowUnFollow {
         return sbPost.toString();
     }
 
-    public int followRequest() {
+    public void followRequest(final int position) {
 
-        int result= 0;
 
         MySingleton singleton = MySingleton.getInstance(mcontext);
 
@@ -61,26 +64,66 @@ public class NetworkUtilsFollowUnFollow {
                         //check story Id exist
                         //TODO: if story ID exists reuslt =1 else result =0
 
+                        String Story_id = "";
+
+                        if (mcontext instanceof MainActivity) {
+
+                            MainActivity activity = (MainActivity) mcontext;
+
+                            try {
+                                Story_id = response.getJSONObject("data").getString("story_id");
+                                activity.demo1(position, "1");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                activity.demo1(position, "0");
+                            }
+
+                        }
+
+                        if (mcontext instanceof DetailsActivity) {
+
+                            DetailsActivity activity = (DetailsActivity) mcontext;
+
+                            try {
+                                Story_id = response.getJSONObject("data").getString("story_id");
+                                activity.DetailsActivitydemo("1");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                activity.DetailsActivitydemo("0");
+                            }
+
+                        }
+
+                        if(mcontext instanceof LoginActivity){
+                            LoginActivity activity = (LoginActivity)mcontext;
+
+                            try {
+                                Story_id = response.getJSONObject("data").getString("story_id");
+                                activity.startActivityMD("1");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                activity.startActivityMD("0");
+                            }
+
+                        }
+
 
                     }
-
-
-                    //mEarthquakedatajsonclass = red;
 
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        // Auto-generated method stub
 
                     }
-                })  {
+                }) {
             @Override
-        public Map<String, String> getHeaders() throws AuthFailureError {
-            HashMap<String,String> headerParam = new HashMap<>();
-            headerParam.put("Content-Type","multipart/form-data;boundary="+BOUNDARY+";");
-            return headerParam;
-        }
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headerParam = new HashMap<>();
+                headerParam.put("Content-Type", "multipart/form-data;boundary=" + BOUNDARY + ";");
+                return headerParam;
+            }
+
             @Override
             public byte[] getBody() {
 
@@ -88,20 +131,16 @@ public class NetworkUtilsFollowUnFollow {
 
                 return postBody.getBytes();
             }
-            //nee to implement params for post request.
+
         };
 
         singleton.addToRequestQueue(jsObjRequest);
-
-        return result;
 
 
     }
 
 
-    public int unFollowRequest(String storyId){
-
-        int result =1;
+    public void unFollowRequest(final int position) {
 
         MySingleton singleton = MySingleton.getInstance(mcontext);
 
@@ -110,17 +149,40 @@ public class NetworkUtilsFollowUnFollow {
 
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.i("followjsonresponse", response.toString());
+                        Log.i("unfollowjsonresponse", response.toString());
 
                         //TODO return reuslt
 
+                        String Story_id = "";
+
+                        if (mcontext instanceof MainActivity) {
+
+                            MainActivity activity = (MainActivity) mcontext;
+
+                            try {
+                                Story_id = response.getJSONObject("data").getString("story_id");
+                                activity.demo1(position, "0");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                activity.demo1(position, "1");
+                            }
+                        } else if (mcontext instanceof DetailsActivity) {
+                            DetailsActivity activity = (DetailsActivity) mcontext;
+
+                            try {
+                                Story_id = response.getJSONObject("data").getString("story_id");
+                                activity.DetailsActivitydemo("0");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                activity.DetailsActivitydemo("1");
+                            }
 
 
+                        }
 
                     }
 
 
-                    //mEarthquakedatajsonclass = red;
 
                 }, new Response.ErrorListener() {
 
@@ -129,22 +191,28 @@ public class NetworkUtilsFollowUnFollow {
                         // Auto-generated method stub
 
                     }
-                }){
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String,String> headers = new HashMap<String, String>();
-                headers.put("TOKEN_KEY","TokenValue");
-                headers.put("USER_ID","userId");
-                return headers;
+                HashMap<String, String> headerParam = new HashMap<>();
+                headerParam.put("Content-Type", "multipart/form-data;boundary=" + BOUNDARY + ";");
+                return headerParam;
             }
-            //nee to implement params for post request.
+
+            @Override
+            public byte[] getBody() {
+
+                String postBody = createPostBody(params);
+
+                return postBody.getBytes();
+            }
+
         };
 
+        singleton.addToRequestQueue(jsObjRequest);
 
-     return result;
 
     }
-
 
 
 }

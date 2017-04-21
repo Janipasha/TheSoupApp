@@ -77,7 +77,7 @@ public class NetworkUtilsLogin {
                         }
 
                         LoginActivity Object = (LoginActivity) mcontext;
-                        Object.Demo(outh_token);
+
 
                       SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mcontext);
                         SharedPreferences.Editor editor = pref.edit();
@@ -86,6 +86,8 @@ public class NetworkUtilsLogin {
 
 
                         Log.d("prefvalue 1", pref.getString("auth_token",null)+"-----");
+
+                        Object.Followpasson();
 
 
 

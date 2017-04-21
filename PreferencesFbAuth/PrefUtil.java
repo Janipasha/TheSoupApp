@@ -30,6 +30,7 @@ public class PrefUtil {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("auth_token", token);
+        editor.apply();
     }
 
     public String getGeneratedUserToken(){
