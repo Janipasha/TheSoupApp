@@ -130,4 +130,84 @@ public class NetworkUtilsLogin {
 
 
     }
+
+
+    public void loginvolleyRequestfromMain(){
+
+
+
+        MySingleton singleton = MySingleton.getInstance(mcontext);
+
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, SoupContract.LOGINURL, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("loginjsonresponse", response.toString());
+
+                        String outh_token= "" ;
+
+
+
+
+                        try {
+                            outh_token = response.getJSONObject("data").getString("token");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        LoginActivity Object = (LoginActivity) mcontext;
+
+
+                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mcontext);
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putString("auth_token",outh_token);
+                        editor.apply();
+
+
+                        Log.d("prefvalue 1", pref.getString("auth_token",null)+"-----");
+
+                        Object.startActivityMD("0");
+
+
+
+
+
+
+
+
+
+                    }
+
+
+
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String,String> headerParam = new HashMap<>();
+                headerParam.put("Content-Type","multipart/form-data;boundary="+BOUNDARY+";");
+                return headerParam;
+            }
+            @Override
+            public byte[] getBody() {
+                String postBody = createPostBody(params);
+
+                return postBody.getBytes();
+            }
+
+
+        };
+
+        singleton.addToRequestQueue(jsObjRequest);
+
+
+
+    }
 }

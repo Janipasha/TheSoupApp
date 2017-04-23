@@ -3,6 +3,9 @@ package in.thesoup.thesoup.Activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,10 +13,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.facebook.FacebookSdk;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +35,7 @@ import in.thesoup.thesoup.Adapters.StoryFeedAdapter;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static android.R.id.empty;
 import static android.os.Build.VERSION_CODES.N;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,59 +44,77 @@ public class MainActivity extends AppCompatActivity {
     private List<StoryData> mStoryData;
     private RecyclerView StoryView;
     private HashMap<String, String> params;
+    private SharedPreferences pref;
+    private Button Discover, MyFeed;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FacebookSdk.sdkInitialize(getApplicationContext());
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.getstorieslist);
 
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        params = new HashMap<>();
+        Bundle extras = getIntent().getExtras();
+        Intent intent = getIntent();
 
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.getstorieslist);
 
-        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/OpenSans-Semibolditalic.ttf")
-                .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
 
-
-        mStoryData = new ArrayList<>();
+            Discover = (Button) findViewById(R.id.discover);
+            MyFeed = (Button) findViewById(R.id.myfeed);
 
 
-        StoryView = (RecyclerView) findViewById(R.id.list);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        StoryView.setLayoutManager(layoutManager);
-
-        StoryView.setHasFixedSize(true);
-
-        if (TextUtils.isEmpty( pref.getString("auth_token", null))) {
+            pref = PreferenceManager.getDefaultSharedPreferences(this);
+            params = new HashMap<>();
 
 
-
-            NetworkUtils networkutils = new NetworkUtils(MainActivity.this, mStoryData);
-
-
-            networkutils.getFeed();
-
-        } else {
-
-            params.put("auth_token", pref.getString("auth_token", null));
-
-            Log.d("auth_token",pref.getString("auth_token",null));
-            NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(MainActivity.this, mStoryData, params);
+            CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                    .setDefaultFontPath("fonts/OpenSans-Semibolditalic.ttf")
+                    .setFontAttrId(R.attr.fontPath)
+                    .build()
+            );
 
 
-            networkutilsToken.getFeed();
+            mStoryData = new ArrayList<>();
+
+
+            StoryView = (RecyclerView) findViewById(R.id.list);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            StoryView.setLayoutManager(layoutManager);
+
+            StoryView.setHasFixedSize(true);
+
+
+
+            if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
+
+
+                NetworkUtils networkutils = new NetworkUtils(MainActivity.this, mStoryData);
+
+
+                networkutils.getFeed();
+
+            } else {
+
+                params.put("auth_token", pref.getString("auth_token", null));
+
+                Log.d("auth_token", pref.getString("auth_token", null));
+
+                NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(MainActivity.this, mStoryData, params);
+
+
+                networkutilsToken.getFeed();
+
+            }
 
         }
 
 
 
-    }
+
+
 
     public void startAdapter(List<StoryData> mStoryData){
         mStoryfeedAdapter = new StoryFeedAdapter(mStoryData, MainActivity.this);
@@ -125,6 +153,29 @@ public class MainActivity extends AppCompatActivity {
   public  void demo1(int position , String followstatus){
         mStoryData.get(position).changeFollowStatus(followstatus);
         mStoryfeedAdapter.refreshData(mStoryData);
+    }
+
+    public void ActivityInflate(View view){
+
+        if(view == Discover){
+         Intent intent = new Intent(this,MainActivity.class);
+            finish();
+            startActivity(intent);
+        }
+
+        if(view== MyFeed){
+            if(TextUtils.isEmpty(pref.getString("auth_token",""))){
+                Intent intent = new Intent(this,LoginActivity.class);
+                startActivity(intent);
+
+            }else {
+
+                Intent intent = new Intent ( this, feedActivity.class);
+                finish();
+                startActivity(intent);
+                // TODO: Write code to handle errror, change intents as well
+            }
+        }
     }
 
 

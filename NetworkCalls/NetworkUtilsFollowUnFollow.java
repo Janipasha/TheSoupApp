@@ -18,7 +18,10 @@ import java.util.Map;
 import in.thesoup.thesoup.Activities.DetailsActivity;
 import in.thesoup.thesoup.Activities.LoginActivity;
 import in.thesoup.thesoup.Activities.MainActivity;
+import in.thesoup.thesoup.Activities.feedActivity;
 import in.thesoup.thesoup.SoupContract;
+
+import static android.os.Build.VERSION_CODES.M;
 
 /**
  * Created by Jani on 17-04-2017.
@@ -107,6 +110,20 @@ public class NetworkUtilsFollowUnFollow {
 
                         }
 
+                        if (mcontext instanceof feedActivity) {
+
+                            feedActivity activity = (feedActivity) mcontext;
+
+                            try {
+                                Story_id = response.getJSONObject("data").getString("story_id");
+                                activity.demo1(position, "1");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                activity.demo1(position, "0");
+                            }
+
+                        }
+
 
                     }
 
@@ -178,12 +195,21 @@ public class NetworkUtilsFollowUnFollow {
                             }
 
 
+                        } else if (mcontext instanceof feedActivity) {
+
+                            feedActivity activity = (feedActivity) mcontext;
+
+                            try {
+                                Story_id = response.getJSONObject("data").getString("story_id");
+                                activity.demo1(position, "0");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                activity.demo1(position, "1");
+
+                            }
+
                         }
-
                     }
-
-
-
                 }, new Response.ErrorListener() {
 
                     @Override

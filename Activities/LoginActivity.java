@@ -57,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
     PrefUtil prefUtil;
     private String StoryId,activityId;
     private HashMap<String, String> params;
+    private Intent intent1;
 
 
 
@@ -66,14 +67,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.loginpage);
-
-        Bundle extras = getIntent().getExtras();
-        StoryId = extras.getString("story_id", "");
-        activityId = extras.getString("activity","");
-
-
-       Log.d("activityId",activityId);
-
 
         prefUtil = new PrefUtil(LoginActivity.this);
 
@@ -87,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                 new FacebookCallback<LoginResult>() {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
+
 
                         String getScopes = loginResult.getAccessToken().getPermissions().toString();
                         Log.d("Scopes", getScopes);
@@ -133,9 +127,27 @@ public class LoginActivity extends AppCompatActivity {
                                         }
 
 
+
                                         NetworkUtilsLogin loginRequest = new NetworkUtilsLogin(LoginActivity.this, params);
 
-                                        loginRequest.loginvolleyRequest();
+
+                                        intent1 = getIntent();
+
+                                        if(intent1.hasExtra("story_id")&&intent1.hasExtra("acivity")){
+
+                                            Bundle extras = getIntent().getExtras();
+                                            StoryId = extras.getString("story_id", "");
+                                            activityId = extras.getString("activity","");
+
+                                            Log.d("activityId",activityId);
+
+                                            loginRequest.loginvolleyRequest() ;
+                                        }else{
+                                            loginRequest.loginvolleyRequestfromMain();
+                                        }
+
+                                        
+
 
 
                                         if (response.getError() != null) {
@@ -182,17 +194,28 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    public void startActivityMD(String followstatus){
-        if(activityId.equals("0")) {
+    public void startActivityMD(String followstatus) {
 
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-        }else if(activityId.equals("1")) {
-            Intent intent = new Intent(LoginActivity.this,DetailsActivity.class);
-            intent.putExtra("story_id",StoryId);
-            intent.putExtra("followstatus",followstatus);
-            startActivity(intent);
-        }
+        if (intent1.hasExtra("activity")) {
+            if (activityId.equals("0")) {
+
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                finish();
+                startActivity(intent);
+            } else if (activityId.equals("1")) {
+                Intent intent = new Intent(LoginActivity.this, DetailsActivity.class);
+                intent.putExtra("story_id", StoryId);
+                intent.putExtra("followstatus", followstatus);
+                finish();
+                startActivity(intent);
+            }
+        }else {
+                Intent intent = new Intent(LoginActivity.this, feedActivity.class);
+                intent.putExtra("feedIdfromLogin", "1");
+                finish();
+                startActivity(intent);
+            }
+
 
     }
 

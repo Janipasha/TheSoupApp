@@ -34,8 +34,7 @@ public class ArticlesActivity extends AppCompatActivity{
         setContentView(R.layout.getarticles);
 
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
 
         Intent in = getIntent();
         mArticles =(List<Articles>) in.getSerializableExtra("ARTICLELIST");

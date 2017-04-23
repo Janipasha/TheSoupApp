@@ -14,6 +14,7 @@ import java.util.List;
 
 import in.thesoup.thesoup.Activities.DetailsActivity;
 import in.thesoup.thesoup.Activities.MainActivity;
+import in.thesoup.thesoup.Activities.feedActivity;
 import in.thesoup.thesoup.Adapters.SingleStoryAdapter;
 import in.thesoup.thesoup.Adapters.StoryFeedAdapter;
 import in.thesoup.thesoup.GSONclasses.FeedGSON.GetStoryFeed;
@@ -47,9 +48,19 @@ public class gsonConversion {
             mListFromJson.add(red.getStoryDataList().get(i));
         }
 
-        MainActivity activity = (MainActivity) context;
 
-        activity.startAdapter(mListFromJson);
+
+        if(context instanceof MainActivity) {
+            MainActivity activity = (MainActivity)context;
+
+            activity.startAdapter(mListFromJson);
+
+        }
+
+        if(context instanceof feedActivity){
+            feedActivity activity = (feedActivity)context;
+            activity.startAdapter(mListFromJson);
+        }
     }
 
     public void fillStoryUI(JSONObject jsonObject, List<Substories> substories, String StoryTitle, String followstatus, Context context){
