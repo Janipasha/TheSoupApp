@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -39,6 +42,12 @@ public class ArticlesActivity extends AppCompatActivity{
         Intent in = getIntent();
         mArticles =(List<Articles>) in.getSerializableExtra("ARTICLELIST");
 
+        for(int i =0;i<mArticles.size();i++) {
+
+            Log.d("Article Json", mArticles.get(i).getArticletitle());
+
+        }
+
         //gsonConversion articlelist = new gsonConversion();
         //articlelist.ArticleJson(mString,mArticles);
 
@@ -58,4 +67,6 @@ public class ArticlesActivity extends AppCompatActivity{
 
 
     }
+
+
 }

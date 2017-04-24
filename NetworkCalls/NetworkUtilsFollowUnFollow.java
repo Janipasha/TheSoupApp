@@ -64,8 +64,6 @@ public class NetworkUtilsFollowUnFollow {
                     public void onResponse(JSONObject response) {
                         Log.i("followjsonresponse", response.toString());
 
-                        //check story Id exist
-                        //TODO: if story ID exists reuslt =1 else result =0
 
                         String Story_id = "";
 
@@ -168,7 +166,6 @@ public class NetworkUtilsFollowUnFollow {
                     public void onResponse(JSONObject response) {
                         Log.i("unfollowjsonresponse", response.toString());
 
-                        //TODO return reuslt
 
                         String Story_id = "";
 

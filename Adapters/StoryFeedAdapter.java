@@ -161,7 +161,6 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
 
 
-            //TODO: unfollow request network call return and then change text
         }
     }
 

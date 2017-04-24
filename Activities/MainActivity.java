@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private HashMap<String, String> params;
     private SharedPreferences pref;
     private Button Discover, MyFeed;
+    private EndlessRecyclerViewScrollListener scrollListener;
+
 
 
     @Override
@@ -84,32 +86,82 @@ public class MainActivity extends AppCompatActivity {
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             StoryView.setLayoutManager(layoutManager);
 
-            StoryView.setHasFixedSize(true);
 
 
-
-            if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
-
-
-                NetworkUtils networkutils = new NetworkUtils(MainActivity.this, mStoryData);
-
-
-                networkutils.getFeed();
-
-            } else {
-
-                params.put("auth_token", pref.getString("auth_token", null));
-
-                Log.d("auth_token", pref.getString("auth_token", null));
-
-                NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(MainActivity.this, mStoryData, params);
-
-
-                networkutilsToken.getFeed();
+        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadNextDataFromApi(page);
 
             }
+        };
+
+            StoryView.setHasFixedSize(true);
+        StoryView.addOnScrollListener(scrollListener);
+
+        if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
+
+
+            params.put("page","0");
+
+
+            NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(MainActivity.this, mStoryData, params);
+
+
+            networkutilsToken.getFeed();
+
+        } else {
+
+            params.put("auth_token", pref.getString("auth_token", null));
+            params.put("page","0");
+
+            Log.d("auth_token", pref.getString("auth_token", null));
+
+            NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(MainActivity.this, mStoryData, params);
+
+
+            networkutilsToken.getFeed();
 
         }
+
+        }
+
+    public void loadNextDataFromApi(int offset) {
+
+        String Page = String.valueOf(offset);
+
+        if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
+
+
+            params.put("page",Page);
+
+
+            NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(MainActivity.this, mStoryData, params);
+
+
+            networkutilsToken.getFeed();
+
+        } else {
+
+            params.put("auth_token", pref.getString("auth_token", null));
+            params.put("page",Page);
+
+            Log.d("auth_token", pref.getString("auth_token", null));
+
+            NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(MainActivity.this, mStoryData, params);
+
+
+            networkutilsToken.getFeed();
+
+        }
+
+
+
+
+
+    }
 
 
 
@@ -173,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent ( this, feedActivity.class);
                 finish();
                 startActivity(intent);
-                // TODO: Write code to handle errror, change intents as well
+
             }
         }
     }

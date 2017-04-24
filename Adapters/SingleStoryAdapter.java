@@ -125,7 +125,6 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             Intent intent = new Intent(mcontext, ArticlesActivity.class);
 
             intent.putExtra("ARTICLELIST",(Serializable)mArticles);
-            //Todo: implement putextra
             mcontext.startActivity(intent);
 
         }
@@ -204,9 +203,6 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         unFollowrequest.unFollowRequest(clickposition);
 
 
-
-
-        //TODO: unfollow request network call return and then change text
     }
     }
 
