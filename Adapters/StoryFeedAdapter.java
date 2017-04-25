@@ -228,7 +228,7 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
         holder.storyTitle.setText(storytitle);
         holder.substoryTitle.setText(substorytitle);
-        Picasso.with(context).load(ImageUrl).into(holder.imageView);
+        Picasso.with(context).load(ImageUrl).centerCrop().resize(400,300).into(holder.imageView);
 
         holder.date.setText(Date);
         holder.month.setText(month);

@@ -1,5 +1,6 @@
 package in.thesoup.thesoup.Activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -19,6 +20,8 @@ import in.thesoup.thesoup.Adapters.ArticlesAdapter;
 import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Articles;
 import in.thesoup.thesoup.R;
 import in.thesoup.thesoup.gsonConversion;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by Jani on 13-04-2017.
@@ -31,10 +34,17 @@ public class ArticlesActivity extends AppCompatActivity{
     private RecyclerView ArticlesView;
     private ArticlesAdapter mArticlesAdapter;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.getarticles);
+
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/OpenSans-Semibolditalic.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
 
 
 
@@ -66,6 +76,11 @@ public class ArticlesActivity extends AppCompatActivity{
 
 
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
 

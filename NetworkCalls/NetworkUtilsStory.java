@@ -37,17 +37,18 @@ public class NetworkUtilsStory {
     private List<Substories> mSubstories;
     private String Storytitle, followstatus,StoryId;
     private final String BOUNDARY= "whatsnonega";
+    private HashMap<String,String> params;
 
 
 
 
 
-    public NetworkUtilsStory(Context context, List<Substories> substories,String Storytitle, String followstatus,String StoryId){
+    public NetworkUtilsStory(Context context, List<Substories> substories,String Storytitle, String followstatus,HashMap<String,String> params){
         this.mcontext = context;
         this.mSubstories= substories;
         this.Storytitle = Storytitle;
         this.followstatus =followstatus;
-        this.StoryId = StoryId;
+        this.params = params;
 
     }
 
@@ -71,8 +72,6 @@ public class NetworkUtilsStory {
        // String Url = SoupContract.STORYURL +StoryId;
 
 
-         HashMap<String,String> storyparam = new HashMap<>();
-        storyparam.put("story_id", StoryId);
 
 
 
@@ -117,9 +116,7 @@ public class NetworkUtilsStory {
 
             @Override
             public byte[] getBody() {
-                HashMap<String,String> Params = new HashMap<>();
-                Params.put("story_id", StoryId);
-                String postBody = createPostBody(Params);
+                String postBody = createPostBody(params);
 
                 return postBody.getBytes();
             }

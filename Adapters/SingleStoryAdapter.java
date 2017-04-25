@@ -281,7 +281,7 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ((StoryViewHolder) holder).mMonth.setText(month);
             ((StoryViewHolder) holder).mYear.setText(year);
             ((StoryViewHolder) holder).mSubstory.setText(substoryTitle);
-            Picasso.with(mcontext).load(SubstoryImage).into(((StoryViewHolder)holder).mImageView);
+            Picasso.with(mcontext).load(SubstoryImage).centerCrop().resize(400,300).into(((StoryViewHolder)holder).mImageView);
 
         }
 

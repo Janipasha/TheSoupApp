@@ -54,7 +54,7 @@ public class ArticlesAdapter extends RecyclerView.Adapter<ArticlesAdapter.ViewHo
 
         holder.articleTitle.setText(articleTitle);
         holder.newsource.setText(newsSource);
-        Picasso.with(mcontext).load(imageUrl).into(holder.imageView);
+        Picasso.with(mcontext).load(imageUrl).centerCrop().resize(80,80).into(holder.imageView);
 
 
     }
