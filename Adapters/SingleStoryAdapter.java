@@ -3,8 +3,10 @@ package in.thesoup.thesoup.Adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -226,8 +228,21 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
 
         if (holder instanceof HeaderViewHolder) {
-            StoryTitle = storyTitle;
-            ((HeaderViewHolder) holder).Storytitle.setText(StoryTitle);
+
+            String storytitlehtml;
+
+            if(Build.VERSION.SDK_INT >= 24){
+                storytitlehtml = String.valueOf(Html.fromHtml(storyTitle , Html.FROM_HTML_MODE_LEGACY));
+
+            }else{
+
+                storytitlehtml = String.valueOf (Html.fromHtml(storyTitle));
+            }
+
+            //StoryTitle = storyTitle;
+
+
+            ((HeaderViewHolder) holder).Storytitle.setText(storytitlehtml);
 
             String nfollowstatus = followstatus;
 
@@ -244,6 +259,15 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             String Time = mSubstories.getTime();
             String substoryTitle = mSubstories.getSubstoryName();
+            String substoryTitlehtml;
+            if(Build.VERSION.SDK_INT >= 24){
+                substoryTitlehtml= String.valueOf(Html.fromHtml(substoryTitle , Html.FROM_HTML_MODE_LEGACY));
+
+            }else{
+
+                substoryTitlehtml = String.valueOf (Html.fromHtml(substoryTitle));
+            }
+
             int NumberofArticles = mSubstories.getNumberofArticles();
             String SubstoryImage = mSubstories.getSubstoryImageURL();
 
@@ -280,8 +304,8 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             ((StoryViewHolder) holder).mDate.setText(Date);
             ((StoryViewHolder) holder).mMonth.setText(month);
             ((StoryViewHolder) holder).mYear.setText(year);
-            ((StoryViewHolder) holder).mSubstory.setText(substoryTitle);
-            Picasso.with(mcontext).load(SubstoryImage).centerCrop().resize(400,300).into(((StoryViewHolder)holder).mImageView);
+            ((StoryViewHolder) holder).mSubstory.setText(substoryTitlehtml);
+            Picasso.with(mcontext).load(SubstoryImage).centerCrop().placeholder(R.drawable.placeholder).resize(400,300).into(((StoryViewHolder)holder).mImageView);
 
         }
 
@@ -304,7 +328,7 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             Log.d("Time sent is not valid",string);
         }*/
 
-        SimpleDateFormat monthFormat2 = new SimpleDateFormat("MMMM");
+        SimpleDateFormat monthFormat2 = new SimpleDateFormat("MMM");
 
         return monthFormat2.format(date);
 

@@ -36,8 +36,9 @@ public class gsonConversion {
     private Substoryjsondata mSubstoryjsonData;
     private String StoryTitle , followstatus;
 
-    public void fillUI(JSONObject jsonObject,List<StoryData> mListFromJson,Context context){
+    public void fillUI(JSONObject jsonObject,Context context){
 
+        mListFromJson = new ArrayList<>();
         mJsonObject = jsonObject;
 
         Gson gson = new Gson();

@@ -132,10 +132,13 @@ public class LoginActivity extends AppCompatActivity {
 
 
                                         intent1 = getIntent();
+                                        Bundle extras = getIntent().getExtras();
 
-                                        if(intent1.hasExtra("story_id")&&intent1.hasExtra("acivity")){
+                                        Log.d("login",StoryId+ activityId);
 
-                                            Bundle extras = getIntent().getExtras();
+                                        if(extras.containsKey("story_id")&&extras.containsKey("activity")){
+
+                                            //Bundle extras = getIntent().getExtras();
                                             StoryId = extras.getString("story_id", "");
                                             activityId = extras.getString("activity","");
 
@@ -190,6 +193,7 @@ public class LoginActivity extends AppCompatActivity {
 
        NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(this,params);
         followrequest.followRequest(1);//passed for the sake of it , no use
+        //TODO: 1) if user already follows this there will be an error which should be handled
 
 
     }

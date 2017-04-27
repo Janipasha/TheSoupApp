@@ -72,7 +72,7 @@ public class NetworkUtilswithToken {
 
                             gsonConversion mpopulateUI = new gsonConversion();
 
-                            mpopulateUI.fillUI(response,mStoryData,mcontext);
+                            mpopulateUI.fillUI(response,mcontext);
 
 
                         }

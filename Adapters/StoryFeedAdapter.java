@@ -3,8 +3,10 @@ package in.thesoup.thesoup.Adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +32,7 @@ import in.thesoup.thesoup.GSONclasses.FeedGSON.StoryData;
 import in.thesoup.thesoup.NetworkCalls.NetworkUtilsFollowUnFollow;
 import in.thesoup.thesoup.R;
 
+import static android.text.Html.fromHtml;
 import static com.google.gson.internal.bind.util.ISO8601Utils.format;
 
 /**
@@ -49,9 +52,18 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
     }
 
     public void refreshData(List<StoryData> Datalist) {
-        this.StoryDataList = Datalist;
+        //this.StoryDataList = Datalist;
+        StoryDataList.addAll(Datalist);
         notifyDataSetChanged();
     }
+
+    public void refreshfollowstatus(List<StoryData> Datalist){
+        this.StoryDataList = Datalist;
+
+        notifyDataSetChanged();
+
+    }
+
 
     public class DataViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView storyTitle, substoryTitle, date, month, year, numberOfArticles;
@@ -91,6 +103,7 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
             int mposition = getAdapterPosition();
             String mfollowstatus = StoryDataList.get(mposition).getFollowStatus();
             String mString = StoryDataList.get(mposition).getStoryId();
+
 
             if (view == imageView || view == storyTitle) {
 
@@ -180,7 +193,18 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
         final StoryData mStoryData = StoryDataList.get(position);
 
         String storytitle = mStoryData.getStoryName();
+
         String substorytitle = mStoryData.getSubStoryName();
+        String substorytitlehtml,storytitlehtml ;
+        if(Build.VERSION.SDK_INT >= 24){
+            substorytitlehtml = String.valueOf(Html.fromHtml(substorytitle , Html.FROM_HTML_MODE_LEGACY));
+            storytitlehtml = String.valueOf(Html.fromHtml(storytitle , Html.FROM_HTML_MODE_LEGACY));
+
+        }else{
+            substorytitlehtml =String.valueOf (Html.fromHtml( mStoryData.getSubStoryName()));
+            storytitlehtml = String.valueOf (Html.fromHtml( mStoryData.getStoryName()));
+        }
+
         String Time = mStoryData.getTime();
         String Num_of_articles = mStoryData.getNumArticle();
         String followstatus = mStoryData.getFollowStatus();
@@ -226,9 +250,9 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
         }
 
-        holder.storyTitle.setText(storytitle);
-        holder.substoryTitle.setText(substorytitle);
-        Picasso.with(context).load(ImageUrl).centerCrop().resize(400,300).into(holder.imageView);
+        holder.storyTitle.setText(storytitlehtml);
+        holder.substoryTitle.setText(substorytitlehtml);
+        Picasso.with(context).load(ImageUrl).centerCrop().placeholder(R.drawable.placeholder).resize(400,300).into(holder.imageView);
 
         holder.date.setText(Date);
         holder.month.setText(month);
@@ -246,6 +270,9 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
     @Override
     public int getItemCount() {
+
+
+        //Log.d("tech memw",StoryDataList.size() +" ");
         return StoryDataList.size();
     }
 
@@ -260,7 +287,7 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
             Log.d("Time sent is not valid",string);
         }*/
 
-        SimpleDateFormat monthFormat2 = new SimpleDateFormat("MMMM");
+        SimpleDateFormat monthFormat2 = new SimpleDateFormat("MMM");
 
         return monthFormat2.format(date);
 

@@ -72,11 +72,11 @@ public class feedActivity extends AppCompatActivity {
 
 
         mStoryData = new ArrayList<>();
-
-
         StoryView = (RecyclerView) findViewById(R.id.list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         StoryView.setLayoutManager(layoutManager);
+        mStoryfeedAdapter = new StoryFeedAdapter(mStoryData, feedActivity.this);
+        StoryView.setAdapter(mStoryfeedAdapter);
 
         StoryView.setHasFixedSize(true);
 
@@ -107,9 +107,11 @@ public class feedActivity extends AppCompatActivity {
 
 
 
-    public void startAdapter(List<StoryData> mStoryData){
-        mStoryfeedAdapter = new StoryFeedAdapter(mStoryData, feedActivity.this);
-        StoryView.setAdapter(mStoryfeedAdapter);
+
+    public void startAdapter(List<StoryData> mStoryData) {
+        //
+        //StoryView.setAdapter(mStoryfeedAdapter);
+        mStoryfeedAdapter.refreshData(mStoryData);
 
     }
 
@@ -152,7 +154,9 @@ public class feedActivity extends AppCompatActivity {
 
     public  void demo1(int position , String followstatus){
         mStoryData.get(position).changeFollowStatus(followstatus);
-        mStoryfeedAdapter.refreshData(mStoryData);
+        mStoryfeedAdapter.refreshfollowstatus(mStoryData);
     }
     }
+
+//TODO: 2) implement pagination in feed activity as well
 

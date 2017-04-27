@@ -58,75 +58,61 @@ public class MainActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         Intent intent = getIntent();
 
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.getstorieslist);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.getstorieslist);
 
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-            Discover = (Button) findViewById(R.id.discover);
-            MyFeed = (Button) findViewById(R.id.myfeed);
-
-
-            pref = PreferenceManager.getDefaultSharedPreferences(this);
-            params = new HashMap<>();
+        Discover = (Button) findViewById(R.id.discover);
+        MyFeed = (Button) findViewById(R.id.myfeed);
 
 
-            CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                    .setDefaultFontPath("fonts/OpenSans-Semibolditalic.ttf")
-                    .setFontAttrId(R.attr.fontPath)
-                    .build()
-            );
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        params = new HashMap<>();
 
 
-            mStoryData = new ArrayList<>();
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/OpenSans-Semibolditalic.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
 
-
-            StoryView = (RecyclerView) findViewById(R.id.list);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-            StoryView.setLayoutManager(layoutManager);
-
-
-
+        mStoryData = new ArrayList<>();
+        StoryView = (RecyclerView) findViewById(R.id.list);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        StoryView.setLayoutManager(layoutManager);
+        mStoryfeedAdapter = new StoryFeedAdapter(mStoryData, MainActivity.this);
+        StoryView.setAdapter(mStoryfeedAdapter);
+        StoryView.setHasFixedSize(true);
         scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to the bottom of the list
                 loadNextDataFromApi(page);
-
             }
         };
 
-            StoryView.setHasFixedSize(true);
         StoryView.addOnScrollListener(scrollListener);
 
+
         if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
-
-
-            params.put("page","0");
-
-
+            params.put("page", "0");
             NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(MainActivity.this, mStoryData, params);
-
-
             networkutilsToken.getFeed();
-
         } else {
-
             params.put("auth_token", pref.getString("auth_token", null));
-            params.put("page","0");
+            params.put("page", "0");
 
             Log.d("auth_token", pref.getString("auth_token", null));
 
             NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(MainActivity.this, mStoryData, params);
-
-
             networkutilsToken.getFeed();
 
         }
 
-        }
+    }
 
     public void loadNextDataFromApi(int offset) {
 
@@ -135,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
 
 
-            params.put("page",Page);
+            params.put("page", Page);
 
 
             NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(MainActivity.this, mStoryData, params);
@@ -146,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
 
             params.put("auth_token", pref.getString("auth_token", null));
-            params.put("page",Page);
+            params.put("page", Page);
 
             Log.d("auth_token", pref.getString("auth_token", null));
 
@@ -158,19 +144,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
-
-
     }
 
 
-
-
-
-
-    public void startAdapter(List<StoryData> mStoryData){
-        mStoryfeedAdapter = new StoryFeedAdapter(mStoryData, MainActivity.this);
-        StoryView.setAdapter(mStoryfeedAdapter);
+    public void startAdapter(List<StoryData> mStoryData) {
+        //
+        //StoryView.setAdapter(mStoryfeedAdapter);
+        mStoryfeedAdapter.refreshData(mStoryData);
 
     }
 
@@ -195,42 +175,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void demo(String storyId ) {
-        Intent intent = new Intent(this,LoginActivity.class);
-        intent.putExtra("story_id",storyId);
-        intent.putExtra("activity","0");
-        startActivityForResult(intent,35);
+    public void demo(String storyId) {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("story_id", storyId);
+        intent.putExtra("activity", "0");
+        startActivity(intent);
     }
 
-  public  void demo1(int position , String followstatus){
+    public void demo1(int position, String followstatus) {
         mStoryData.get(position).changeFollowStatus(followstatus);
-        mStoryfeedAdapter.refreshData(mStoryData);
+        mStoryfeedAdapter.refreshfollowstatus(mStoryData);
     }
 
-    public void ActivityInflate(View view){
+    public void ActivityInflate(View view) {
 
-        if(view == Discover){
-         Intent intent = new Intent(this,MainActivity.class);
+        if (view == Discover) {
+            Intent intent = new Intent(this, MainActivity.class);
             finish();
             startActivity(intent);
         }
 
-        if(view== MyFeed){
-            if(TextUtils.isEmpty(pref.getString("auth_token",""))){
-                Intent intent = new Intent(this,LoginActivity.class);
+        if (view == MyFeed) {
+            if (TextUtils.isEmpty(pref.getString("auth_token", ""))) {
+                Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
 
-            }else {
+            } else {
 
-                Intent intent = new Intent ( this, feedActivity.class);
+                Intent intent = new Intent(this, feedActivity.class);
                 finish();
                 startActivity(intent);
 
             }
         }
     }
-
-
 
 
 }
