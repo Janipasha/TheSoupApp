@@ -1,6 +1,7 @@
 package in.thesoup.thesoup.Activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInstaller;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +40,8 @@ import in.thesoup.thesoup.NetworkCalls.NetworkUtilsFollowUnFollow;
 import in.thesoup.thesoup.NetworkCalls.NetworkUtilsLogin;
 import in.thesoup.thesoup.PreferencesFbAuth.PrefUtil;
 import in.thesoup.thesoup.R;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import static android.R.attr.data;
 import static android.R.attr.name;
@@ -67,6 +71,18 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.loginpage);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarlogin);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/OpenSans-Semibolditalic.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
 
         prefUtil = new PrefUtil(LoginActivity.this);
 
@@ -134,9 +150,11 @@ public class LoginActivity extends AppCompatActivity {
                                         intent1 = getIntent();
                                         Bundle extras = getIntent().getExtras();
 
-                                        Log.d("login",StoryId+ activityId);
+                                        if(extras == null) {
 
-                                        if(extras.containsKey("story_id")&&extras.containsKey("activity")){
+                                            loginRequest.loginvolleyRequestfromMain();
+
+                                        } else if(extras.containsKey("story_id")&&extras.containsKey("activity")){
 
                                             //Bundle extras = getIntent().getExtras();
                                             StoryId = extras.getString("story_id", "");
@@ -145,8 +163,6 @@ public class LoginActivity extends AppCompatActivity {
                                             Log.d("activityId",activityId);
 
                                             loginRequest.loginvolleyRequest() ;
-                                        }else{
-                                            loginRequest.loginvolleyRequestfromMain();
                                         }
 
                                         
@@ -196,6 +212,11 @@ public class LoginActivity extends AppCompatActivity {
         //TODO: 1) if user already follows this there will be an error which should be handled
 
 
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     public void startActivityMD(String followstatus) {
@@ -285,6 +306,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         callbackmanager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
 

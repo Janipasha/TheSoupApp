@@ -40,6 +40,11 @@ public class ArticlesActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.getarticles);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarArticle);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/OpenSans-Semibolditalic.ttf")
                 .setFontAttrId(R.attr.fontPath)
@@ -81,6 +86,12 @@ public class ArticlesActivity extends AppCompatActivity{
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
 

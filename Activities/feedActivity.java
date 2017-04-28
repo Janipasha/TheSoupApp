@@ -52,8 +52,14 @@ public class feedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.getstorieslist);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/OpenSans-Semibolditalic.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
+
+
 
         Discover = (Button) findViewById(R.id.discover);
         MyFeed = (Button) findViewById(R.id.myfeed);
@@ -80,32 +86,33 @@ public class feedActivity extends AppCompatActivity {
 
         StoryView.setHasFixedSize(true);
 
+        if (intent1.hasExtra("following stories")) {
+            StoryView.setVisibility(View.GONE);
 
-        params.put("auth_token", pref.getString("auth_token", null));
-        params.put("myfeed","1"); // 1 is the value required for getting myfeed
+            TextView mTextView = (TextView) findViewById(R.id.empty_view);
+            mTextView.setText("You have not followed any SOUPS yet\n");
 
-        Log.d("auth_token1", pref.getString("auth_token", null));
-
-        NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(this, mStoryData, params);
+        } else {
 
 
-        networkutilsToken.getFeed();
+            params.put("auth_token", pref.getString("auth_token", null));
+            params.put("myfeed", "1"); // 1 is the value required for getting myfeed
+            params.put("page", "0");
 
-            }
+            Log.d("auth_token1", pref.getString("auth_token", null));
+
+            NetworkUtilswithToken networkutilsToken = new NetworkUtilswithToken(feedActivity.this, mStoryData, params);
+
+
+            networkutilsToken.getFeed();
+        }
+
+    }
 
 
 
     /*else {
-            StoryView.setVisibility(View.GONE);
-
-            TextView mTextView = (TextView) findViewById(R.id.empty_view);
-            mTextView.setText("This is what I am showing logged in users who are new :\n" +
-                    "\"Nothing to show since no stories followed yet.\n" +
-                    "Find something of interest in the 'Discover' section\"");
-
-        }*/
-
-
+            */
 
 
     public void startAdapter(List<StoryData> mStoryData) {
@@ -115,20 +122,20 @@ public class feedActivity extends AppCompatActivity {
 
     }
 
-    public void ActivityInflate(View view){
+    public void ActivityInflate(View view) {
 
-        if(view == Discover){
-            Intent intent = new Intent(this,MainActivity.class);
+        if (view == Discover) {
+            Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
 
-        if(view== MyFeed){
-                Intent intent = new Intent ( this, feedActivity.class);
-                finish();
-                startActivity(intent);
-                // TODO: Write code to handle errror, change intents as well
-            }
+        if (view == MyFeed) {
+            Intent intent = new Intent(this, feedActivity.class);
+            finish();
+            startActivity(intent);
+            // TODO: Write code to handle errror, change intents as well
         }
+    }
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -145,18 +152,20 @@ public class feedActivity extends AppCompatActivity {
         }
     }
 
-    public void demo(String storyId ) {
-        Intent intent = new Intent(this,LoginActivity.class);
-        intent.putExtra("story_id",storyId);
-        intent.putExtra("activity","0");
-        startActivityForResult(intent,35);
+    public void demo(String storyId) {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("story_id", storyId);
+        intent.putExtra("activity", "0");
+        startActivityForResult(intent, 35);
     }
 
-    public  void demo1(int position , String followstatus){
+    public void demo1(int position, String followstatus) {
         mStoryData.get(position).changeFollowStatus(followstatus);
         mStoryfeedAdapter.refreshfollowstatus(mStoryData);
     }
-    }
+
+
+}
 
 //TODO: 2) implement pagination in feed activity as well
 

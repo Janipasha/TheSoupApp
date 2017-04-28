@@ -1,16 +1,24 @@
 package in.thesoup.thesoup.NetworkCalls;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +27,11 @@ import in.thesoup.thesoup.Adapters.StoryFeedAdapter;
 import in.thesoup.thesoup.GSONclasses.FeedGSON.StoryData;
 import in.thesoup.thesoup.SoupContract;
 import in.thesoup.thesoup.gsonConversion;
+import in.thesoup.thesoup.Activities.feedActivity;
+
+import static android.R.attr.start;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
+import static com.android.volley.VolleyLog.TAG;
 
 /**
  * Created by Jani on 20-04-2017.
@@ -30,6 +43,8 @@ public class NetworkUtilswithToken {
         private List<StoryData> mStoryData;
         private final static String BOUNDARY ="khisarner";
         private HashMap<String, String> params;
+
+       private  int statusCode;
 
         public NetworkUtilswithToken(Context context, List<StoryData> storyData,HashMap<String,String> params) {
             this.mcontext = context;
@@ -61,7 +76,7 @@ public class NetworkUtilswithToken {
             //RequestQueue queue = singleton.getRequestQueue();
 
 
-            JsonObjectRequest jsObjRequest = new JsonObjectRequest
+            final JsonObjectRequest jsObjRequest = new JsonObjectRequest
                     (Request.Method.POST, SoupContract.URL, null, new Response.Listener<JSONObject>() {
 
                         @Override
@@ -84,9 +99,50 @@ public class NetworkUtilswithToken {
 
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            // Auto-generated method stub
 
-                        }
+
+                           /* NetworkResponse response = error.networkResponse;
+
+
+                            if (response != null && response.data != null) {*/
+
+                            NetworkResponse networkResponse = error.networkResponse;
+
+                            if(networkResponse!=null){
+                                if(networkResponse.statusCode ==404){
+                                    if (mcontext instanceof feedActivity) {
+                                        if (params.get("page").equals("0")) {
+                                            Intent intent = new Intent(mcontext, feedActivity.class);
+                                            intent.putExtra("following stories", "0");
+                                            mcontext.startActivity(intent);
+                                        }
+
+                                    }
+                            }
+
+
+
+
+
+                            Log.d("asdfghj",error.toString());
+
+                          /*  if(error instanceof ServerError) {
+                                Log.d("lkin", "error worked ");
+                                if (mcontext instanceof feedActivity) {
+                                    if (params.get("page").equals("0")) {
+                                        Intent intent = new Intent(mcontext, feedActivity.class);
+                                        intent.putExtra("following stories", "0");
+                                        mcontext.startActivity(intent);
+                                    }*/
+
+
+                                }
+                            }
+
+
+
+
+
                     }){
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
@@ -101,9 +157,22 @@ public class NetworkUtilswithToken {
                     return postBody.getBytes();
                 }
 
+                @Override
+                protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+                   /* if(volleyError.networkResponse != null && volleyError.networkResponse.data != null){
+                        VolleyError error = new VolleyError(new String(volleyError.networkResponse.data));
+                        volleyError = error;
+                    }
+
+                    return volleyError;*/
+
+                    statusCode = response.statusCode;
+                    return super.parseNetworkResponse(response);
+                }
             };
 
             singleton.addToRequestQueue(jsObjRequest); //
 
 
-}}
+}
+}
