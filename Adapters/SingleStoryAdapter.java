@@ -41,9 +41,11 @@ import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Substories;
 import static android.R.attr.onClick;
 import static android.R.attr.start;
 import static android.R.attr.subtitleTextStyle;
+import static android.R.attr.subtypeId;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 import static android.media.CamcorderProfile.get;
 import static in.thesoup.thesoup.R.id.month;
+import static in.thesoup.thesoup.R.id.substory_title;
 import static in.thesoup.thesoup.R.id.year;
 import static in.thesoup.thesoup.R.layout.story;
 
@@ -121,12 +123,16 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         @Override
         public void onClick(View view) {
             int nposition = getAdapterPosition();
+            String StoryId = substories.get(nposition).getSubstoryId();
             List<Articles> mArticles = substories.get(nposition-1).getArticles();
+
 
 
             Intent intent = new Intent(mcontext, ArticlesActivity.class);
 
             intent.putExtra("ARTICLELIST",(Serializable)mArticles);
+            intent.putExtra("StoryTitle",storyTitle);
+            intent.putExtra("story_id",StoryId);
             mcontext.startActivity(intent);
 
         }

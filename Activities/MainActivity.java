@@ -3,9 +3,7 @@ package in.thesoup.thesoup.Activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,30 +11,26 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.facebook.FacebookSdk;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import in.thesoup.thesoup.Application.AnalyticsApplication;
 import in.thesoup.thesoup.GSONclasses.FeedGSON.StoryData;
-import in.thesoup.thesoup.NetworkCalls.NetworkUtils;
 import in.thesoup.thesoup.NetworkCalls.NetworkUtilswithToken;
 import in.thesoup.thesoup.R;
 import in.thesoup.thesoup.Adapters.StoryFeedAdapter;
+import in.thesoup.thesoup.SoupContract;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
-
-import static android.R.id.empty;
-import static android.os.Build.VERSION_CODES.N;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,12 +41,19 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences pref;
     private Button Discover, MyFeed;
     private EndlessRecyclerViewScrollListener scrollListener;
+    private Tracker mTracker;
+    private AnalyticsApplication application;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FacebookSdk.sdkInitialize(getApplicationContext());
+
+        View decorView = getWindow().getDecorView();
+// Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
 
 
         Bundle extras = getIntent().getExtras();
@@ -61,11 +62,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.getstorieslist);
 
+      application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+
+        SendActivityInfoToGA();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Discover = (Button) findViewById(R.id.discover);
+
+        View viewFeed = (View)findViewById(R.id.line_view_feed);
+        viewFeed.setVisibility(View.GONE);
+
         MyFeed = (Button) findViewById(R.id.myfeed);
+        MyFeed.setTextColor(Color.parseColor("#80ffffff"));
 
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -157,7 +168,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        application.sendScreenName(mTracker, SoupContract.DISCOVER_VIEWED);
 
+        if(pref.contains(SoupContract.FB_ID)){
+
+            Log.d("fb_id",pref.getString(SoupContract.FB_ID,null));
+
+            String name = pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null);
+            application.sendEventUser(mTracker, SoupContract.PAGE_VIEW,SoupContract.DISCOVER_VIEWED,
+                    SoupContract.HOME_PAGE,SoupContract.FB_ID,name);
+        }else {
+
+            application.sendEvent(mTracker, SoupContract.PAGE_VIEW, SoupContract.DISCOVER_VIEWED, SoupContract.HOME_PAGE);
+        }
     }
 
     @Override
@@ -190,6 +213,20 @@ public class MainActivity extends AppCompatActivity {
     public void ActivityInflate(View view) {
 
         if (view == Discover) {
+
+            if(pref.contains(SoupContract.FB_ID)){
+
+                Log.d("fb_id",pref.getString(SoupContract.FB_ID,null));
+
+                String name = pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null);
+                application.sendEventUser(mTracker, SoupContract.CLICK,SoupContract.CLICK_DISCOVER,
+                        SoupContract.HOME_PAGE,SoupContract.FB_ID,name);
+            }else {
+
+                application.sendEvent(mTracker, SoupContract.CLICK, SoupContract.CLICK_DISCOVER, SoupContract.HOME_PAGE);
+            }
+
+
             Intent intent = new Intent(this, MainActivity.class);
             finish();
             startActivity(intent);
@@ -197,10 +234,17 @@ public class MainActivity extends AppCompatActivity {
 
         if (view == MyFeed) {
             if (TextUtils.isEmpty(pref.getString("auth_token", ""))) {
+
+                application.sendEvent(mTracker, SoupContract.CLICK, SoupContract.CLICK_MYFEED, SoupContract.HOME_PAGE);
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
 
             } else {
+
+
+                String name = pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null);
+                application.sendEventUser(mTracker, SoupContract.CLICK,SoupContract.CLICK_MYFEED,
+                        SoupContract.HOME_PAGE,SoupContract.FB_ID,name);
 
                 Intent intent = new Intent(this, feedActivity.class);
                 finish();
@@ -208,6 +252,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
+    }
+
+    public void SendActivityInfoToGA(){
+
     }
 
 

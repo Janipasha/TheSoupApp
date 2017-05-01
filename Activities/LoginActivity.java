@@ -1,54 +1,40 @@
 package in.thesoup.thesoup.Activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInstaller;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.analytics.Tracker;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import in.thesoup.thesoup.Application.AnalyticsApplication;
 import in.thesoup.thesoup.NetworkCalls.NetworkUtilsFollowUnFollow;
 import in.thesoup.thesoup.NetworkCalls.NetworkUtilsLogin;
 import in.thesoup.thesoup.PreferencesFbAuth.PrefUtil;
 import in.thesoup.thesoup.R;
+import in.thesoup.thesoup.SoupContract;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
-
-import static android.R.attr.data;
-import static android.R.attr.name;
-import static android.R.attr.value;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-import static com.facebook.internal.CallbackManagerImpl.RequestCodeOffset.Share;
 
 /**
  * Created by Jani on 11-04-2017.
@@ -62,6 +48,11 @@ public class LoginActivity extends AppCompatActivity {
     private String StoryId,activityId;
     private HashMap<String, String> params;
     private Intent intent1;
+    private Tracker mTracker;
+    private AnalyticsApplication application;
+    private SharedPreferences pref;
+    private String StoryTitle = "";
+    private Bundle extras;
 
 
 
@@ -69,8 +60,15 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        View decorView = getWindow().getDecorView();
+// Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
 
         setContentView(R.layout.loginpage);
+
+        application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarlogin);
         setSupportActionBar(toolbar);
@@ -83,6 +81,20 @@ public class LoginActivity extends AppCompatActivity {
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
+        extras = getIntent().getExtras();
+
+        if(extras==null){
+            application.sendEvent(mTracker, SoupContract.PAGE_VIEW, SoupContract.LOGINPAGE_VIEWED, SoupContract.LOGIN_PAGE);
+
+        }
+        else if(extras.containsKey("story_id")){
+            StoryId = extras.getString("story_id", "");
+
+            Log.d("StoryID analytics ",StoryId);
+
+            application.sendEventCollection(mTracker,SoupContract.PAGE_VIEW,SoupContract.LOGINPAGE_VIEWED,SoupContract.LOGIN_PAGE,StoryId,StoryTitle);
+
+        }
 
         prefUtil = new PrefUtil(LoginActivity.this);
 
@@ -129,6 +141,7 @@ public class LoginActivity extends AppCompatActivity {
                                         //params.put("dob",);//send dob as null for future
                                         params.put("image_url", prefUtil.getPictureUrl());
 
+
                                         // Log.d("prefUtilemail",prefUtil.getEmail());
 
                                         for (String name : params.keySet()) {
@@ -148,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
                                         intent1 = getIntent();
-                                        Bundle extras = getIntent().getExtras();
+
 
                                         if(extras == null) {
 
@@ -158,6 +171,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                             //Bundle extras = getIntent().getExtras();
                                             StoryId = extras.getString("story_id", "");
+
                                             activityId = extras.getString("activity","");
 
                                             Log.d("activityId",activityId);
@@ -213,6 +227,18 @@ public class LoginActivity extends AppCompatActivity {
 
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        application.sendScreenName(mTracker, SoupContract.LOGINPAGE_VIEWED);
+
+
+
+
+    }
+
 
     @Override
     protected void attachBaseContext(Context newBase) {

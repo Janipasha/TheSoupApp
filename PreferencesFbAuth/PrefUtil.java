@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import in.thesoup.thesoup.SoupContract;
+
 /**
  * Created by Jani on 15-04-2017.
  */
@@ -21,7 +23,7 @@ public class PrefUtil {
     public void saveAccessTokenPermissions(String token,String permissions) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("fb_token", token);
+        editor.putString(SoupContract.FB_ID, token);
         editor.putString("grantedScope", permissions);
         editor.apply(); // This line is IMPORTANT !!!
     }
@@ -42,7 +44,7 @@ public class PrefUtil {
 
     public String getToken() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getString("fb_token", null);
+        return prefs.getString(SoupContract.FB_ID, null);
     }
 
     public String getPermissions() {
@@ -71,12 +73,12 @@ public class PrefUtil {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor editor = prefs.edit();
 
-        editor.putString("first_name", first_name);
-        editor.putString("last_name", last_name);
+        editor.putString(SoupContract.FIRSTNAME, first_name);
+        editor.putString(SoupContract.LASTNAME, last_name);
         editor.putString("email_id", email);
         editor.putString("gender", gender);
         editor.putString("image_url", profileURL);
-        editor.putString("fb_id", id);
+        editor.putString(SoupContract.FB_ID, id);
         editor.putString("age_min", age_min);
         editor.putString("age_max", age_max);
 
@@ -117,7 +119,7 @@ public class PrefUtil {
 
     public String getId(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        return prefs.getString("fb_id",null);
+        return prefs.getString(SoupContract.FB_ID,null);
     }
 
     public String getPictureUrl(){

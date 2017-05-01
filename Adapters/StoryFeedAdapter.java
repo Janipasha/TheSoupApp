@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
@@ -28,6 +29,7 @@ import java.util.List;
 import in.thesoup.thesoup.Activities.DetailsActivity;
 import in.thesoup.thesoup.Activities.LoginActivity;
 import in.thesoup.thesoup.Activities.MainActivity;
+import in.thesoup.thesoup.Application.AnalyticsApplication;
 import in.thesoup.thesoup.GSONclasses.FeedGSON.StoryData;
 import in.thesoup.thesoup.NetworkCalls.NetworkUtilsFollowUnFollow;
 import in.thesoup.thesoup.R;
@@ -126,9 +128,10 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
     public void followstory() {
 
+
         Log.d("follow worked", clickStoryId);
         String mfollowstatus = StoryDataList.get(clickposition).getFollowStatus();
-
+        
         if (mfollowstatus.equals("") || mfollowstatus.equals("0")) {
 
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);

@@ -7,12 +7,15 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.Preference;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import org.json.JSONException;
 
@@ -21,14 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import in.thesoup.thesoup.Adapters.SingleStoryAdapter;
+import in.thesoup.thesoup.Application.AnalyticsApplication;
 import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Substories;
 import in.thesoup.thesoup.NetworkCalls.NetworkUtilsStory;
 import in.thesoup.thesoup.R;
+import in.thesoup.thesoup.SoupContract;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
-
-import static android.R.attr.offset;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  * Created by Jani on 09-04-2017.
@@ -44,13 +46,23 @@ public class DetailsActivity extends AppCompatActivity {
     private EndlessRecyclerViewScrollListener scrollListener;
     private SharedPreferences pref;
     HashMap<String,String> params;
+    private Tracker mTracker;
+    private AnalyticsApplication application;
 
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        View decorView = getWindow().getDecorView();
+// Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
         setContentView(R.layout.getstorydetails);
+
+        application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbardetails);
         setSupportActionBar(toolbar);
@@ -177,6 +189,25 @@ public class DetailsActivity extends AppCompatActivity {
     public void startAdapter(List<Substories> mSubstories, String StoryTitle){
         nSingleStoryAdapter = new SingleStoryAdapter(mSubstories,StoryTitle,followStatus,DetailsActivity.this,StoryId);
         SingleStoryView.setAdapter(nSingleStoryAdapter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        application.sendScreenName(mTracker, SoupContract.COLLECTION_VIEWED);
+
+        if(pref.contains(SoupContract.FB_ID)){
+
+            Log.d("fb_id",pref.getString(SoupContract.FB_ID,null));
+
+            String name = pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null);
+            application.sendEventCollectionUser(mTracker, SoupContract.PAGE_VIEW,SoupContract.COLLECTION_VIEWED,
+                    SoupContract.COLLECTION_PAGE,SoupContract.FB_ID,name,StoryId,StoryTitle);
+        }else {
+
+            application.sendEventCollection(mTracker, SoupContract.PAGE_VIEW, SoupContract.COLLECTION_VIEWED, SoupContract.COLLECTION_PAGE,StoryId,StoryTitle);
+        }
+
     }
 
     @Override
