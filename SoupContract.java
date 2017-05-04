@@ -38,6 +38,12 @@ public class SoupContract {
     public static final String LOGINPAGE_VIEWED = "viewed_login_page";
     public static final String ARTICLEWEB_PAGE = "article_web_page";
     public static final String ARTICLE_WEB_PAGE_VIEWED = "viewed_article_web_page";
+    public static final String CLICK_FOLLOW = "click_follow";
+    public static final String CLICK_UNFOLLOW = "click_unfollow";
+    public static final String CONVERSION = "conversion";
+    public static final String HOME_PAGE_DISCOVER = "home_page_discover";
+    public static final String HOME_PAGE_MYFEED = "home_page_myfeed";
+    public static final String CLICK_SUBCOLLECTION = "click_subcollection";
 
 
 }

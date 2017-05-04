@@ -225,7 +225,12 @@ public class feedActivity extends AppCompatActivity {
         mStoryfeedAdapter.refreshfollowstatus(mStoryData);
     }
 
-
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        finish();
+        startActivity(getIntent());
+    }
 }
 
 //TODO: 2) implement pagination in feed activity as well

@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
+import com.google.android.gms.analytics.Tracker;
 import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
@@ -30,6 +31,7 @@ import in.thesoup.thesoup.Activities.ArticlesActivity;
 import in.thesoup.thesoup.Activities.DetailsActivity;
 import in.thesoup.thesoup.Activities.LoginActivity;
 import in.thesoup.thesoup.Activities.MainActivity;
+import in.thesoup.thesoup.Application.AnalyticsApplication;
 import in.thesoup.thesoup.GSONclasses.FeedGSON.StoryData;
 import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Articles;
 import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Substoryjsondata;
@@ -37,6 +39,7 @@ import in.thesoup.thesoup.NetworkCalls.NetworkUtilsFollowUnFollow;
 import in.thesoup.thesoup.R;
 
 import in.thesoup.thesoup.GSONclasses.SinglestoryGSON.Substories;
+import in.thesoup.thesoup.SoupContract;
 
 import static android.R.attr.onClick;
 import static android.R.attr.start;
@@ -61,6 +64,9 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private String StoryTitle = "";
     private int clickposition;
     private String clickStoryId;
+    private AnalyticsApplication application;
+    private Tracker mTracker;
+    private SharedPreferences pref;
 
     // private List<Substories> mSubstories;
 
@@ -73,9 +79,18 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.clickStoryId = StoryId;
     }
 
-    public void refreshData(String followstatus) {
+    public void refreshData(List<Substories> Datalist,String mStoryTitle ) {
+        this.storyTitle = mStoryTitle;
+        substories.addAll(Datalist);
+        notifyDataSetChanged();
+
+
+         }
+
+    public void refreshFollowStatus(String followstatus){
         this.followstatus = followstatus;
         notifyDataSetChanged();
+
     }
 
     @Override
@@ -122,9 +137,27 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         @Override
         public void onClick(View view) {
+
+            application = AnalyticsApplication.getInstance();
+            mTracker = application.getDefaultTracker();
+            pref = PreferenceManager.getDefaultSharedPreferences(mcontext);
+
             int nposition = getAdapterPosition();
-            String StoryId = substories.get(nposition).getSubstoryId();
+            String StoryId = substories.get(nposition-1).getSubstoryId();
             List<Articles> mArticles = substories.get(nposition-1).getArticles();
+
+
+            if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
+
+                application.sendEventCollection(mTracker,SoupContract.CLICK, SoupContract.CLICK_SUBCOLLECTION,SoupContract.COLLECTION_PAGE,storyTitle,StoryId);
+
+            }else{
+
+                application.sendEventCollectionUser(mTracker,SoupContract.CLICK,SoupContract.CLICK_SUBCOLLECTION,SoupContract.COLLECTION_PAGE
+                        ,storyTitle,StoryId,pref.getString(SoupContract.FB_ID,null),
+                        pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null));
+
+            }
 
 
 
@@ -169,13 +202,18 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         Log.d("follow worked", clickStoryId +"details");
         String mfollowstatus = followstatus;
+        AnalyticsApplication application = AnalyticsApplication.getInstance();
+        Tracker mTracker = application.getDefaultTracker();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mcontext);
 
         if (mfollowstatus.equals("") || mfollowstatus.equals("0")) {
 
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mcontext);
+
 
 
             if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
+
+                application.sendEventCollection(mTracker, SoupContract.CLICK, SoupContract.CLICK_FOLLOW,SoupContract.COLLECTION_PAGE,storyTitle,String.valueOf(clickStoryId));
 
 
                 DetailsActivity activity = (DetailsActivity) mcontext;
@@ -191,6 +229,10 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 params.put("auth_token", pref.getString("auth_token", null));
                 params.put("story_id", clickStoryId);
 
+                application.sendEventCollectionUser(mTracker,SoupContract.CLICK,SoupContract.CLICK_FOLLOW,SoupContract.COLLECTION_PAGE
+                        ,storyTitle,String.valueOf(clickStoryId),pref.getString(SoupContract.FB_ID,null),
+                        pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null));
+
                 NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(mcontext, params);
                 //followrequest.followRequest(clickposition);
 
@@ -199,7 +241,11 @@ public class SingleStoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             }
         }  else if (mfollowstatus.equals("1")) {
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mcontext);
+
+            application.sendEventCollectionUser(mTracker,SoupContract.CLICK,SoupContract.CLICK_UNFOLLOW,SoupContract.COLLECTION_PAGE
+                    ,storyTitle,String.valueOf(clickStoryId),pref.getString(SoupContract.FB_ID,null),
+                    pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null));
+
 
         HashMap<String, String> params = new HashMap<>();
 

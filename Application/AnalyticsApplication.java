@@ -17,6 +17,16 @@ import static android.os.Build.ID;
 public class AnalyticsApplication extends Application {
     private Tracker mTracker;
 
+    static AnalyticsApplication MyAppInstance;
+
+    public AnalyticsApplication(){
+        MyAppInstance = this;
+    }
+
+    public static AnalyticsApplication getInstance(){
+        return MyAppInstance;
+    }
+
     /**
      * Gets the default {@link Tracker} for this {@link Application}.
      * @return tracker
@@ -29,6 +39,8 @@ public class AnalyticsApplication extends Application {
         }
         return mTracker;
     }
+
+
 
     public void sendEventUser(Tracker tracker,String pageview_click,String eventname,String fromwhere,String fb_id,String name ){
 

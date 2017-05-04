@@ -43,11 +43,9 @@ public class NetworkUtilsStory {
 
 
 
-    public NetworkUtilsStory(Context context, List<Substories> substories,String Storytitle, String followstatus,HashMap<String,String> params){
+    public NetworkUtilsStory(Context context,HashMap<String,String> params){
         this.mcontext = context;
-        this.mSubstories= substories;
         this.Storytitle = Storytitle;
-        this.followstatus =followstatus;
         this.params = params;
 
     }
@@ -73,11 +71,6 @@ public class NetworkUtilsStory {
 
 
 
-
-
-
-
-
         //RequestQueue queue = singleton.getRequestQueue();
 
 
@@ -93,7 +86,7 @@ public class NetworkUtilsStory {
 
                         Log.i("gson", mpopulateUIStory.toString());
 
-                        mpopulateUIStory.fillStoryUI(response, mSubstories, Storytitle, followstatus,mcontext);
+                        mpopulateUIStory.fillStoryUI(response,mcontext);
 
 
                     }

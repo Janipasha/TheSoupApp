@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -54,11 +53,6 @@ public class DetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        View decorView = getWindow().getDecorView();
-// Hide the status bar.
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
         setContentView(R.layout.getstorydetails);
 
         application = (AnalyticsApplication) getApplication();
@@ -98,6 +92,9 @@ public class DetailsActivity extends AppCompatActivity {
         SingleStoryView = (RecyclerView) findViewById(R.id.list_story);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         SingleStoryView.setLayoutManager(layoutManager);
+        //nSingleStoryAdapter = new SingleStoryAdapter(mSubstories,StoryTitle,followStatus,DetailsActivity.this,StoryId);
+        //SingleStoryView.setAdapter(nSingleStoryAdapter);
+        SingleStoryView.setHasFixedSize(true);
 
         scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
@@ -109,7 +106,7 @@ public class DetailsActivity extends AppCompatActivity {
             }
         };
 
-        SingleStoryView.setHasFixedSize(true);
+
         
         SingleStoryView.addOnScrollListener(scrollListener);
 
@@ -120,7 +117,7 @@ public class DetailsActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
 
 
-            NetworkUtilsStory networkutils = new NetworkUtilsStory(DetailsActivity.this, mSubstories, StoryTitle, followStatus, params);
+            NetworkUtilsStory networkutils = new NetworkUtilsStory(DetailsActivity.this, params);
 
             try {
                 networkutils.getSingleStory();
@@ -130,7 +127,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         }else{
             params.put("auth_token", pref.getString("auth_token", null));
-            NetworkUtilsStory networkutils = new NetworkUtilsStory(DetailsActivity.this, mSubstories, StoryTitle, followStatus, params);
+            NetworkUtilsStory networkutils = new NetworkUtilsStory(DetailsActivity.this, params);
 
 
 
@@ -141,6 +138,13 @@ public class DetailsActivity extends AppCompatActivity {
             }
 
         }
+
+        StoryTitle = " ";
+        //random value for function to run else throws error in stringValue htm
+
+
+        nSingleStoryAdapter = new SingleStoryAdapter(mSubstories,StoryTitle,followStatus,DetailsActivity.this,StoryId);
+        SingleStoryView.setAdapter(nSingleStoryAdapter);
 
         
 
@@ -160,7 +164,7 @@ public class DetailsActivity extends AppCompatActivity {
             params.put("story_id", StoryId);
 
 
-            NetworkUtilsStory networkutils = new NetworkUtilsStory(DetailsActivity.this, mSubstories, StoryTitle, followStatus, params);
+            NetworkUtilsStory networkutils = new NetworkUtilsStory(DetailsActivity.this, params);
 
             try {
                 networkutils.getSingleStory();
@@ -172,7 +176,7 @@ public class DetailsActivity extends AppCompatActivity {
             params.put("auth_token", pref.getString("auth_token", null));
             params.put("page",page);
             params.put("story_id", StoryId);
-            NetworkUtilsStory networkutils = new NetworkUtilsStory(DetailsActivity.this, mSubstories, StoryTitle, followStatus, params);
+            NetworkUtilsStory networkutils = new NetworkUtilsStory(DetailsActivity.this,params);
 
 
             try {
@@ -187,8 +191,9 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     public void startAdapter(List<Substories> mSubstories, String StoryTitle){
-        nSingleStoryAdapter = new SingleStoryAdapter(mSubstories,StoryTitle,followStatus,DetailsActivity.this,StoryId);
-        SingleStoryView.setAdapter(nSingleStoryAdapter);
+
+
+        nSingleStoryAdapter.refreshData(mSubstories,StoryTitle);
     }
 
     @Override
@@ -202,7 +207,8 @@ public class DetailsActivity extends AppCompatActivity {
 
             String name = pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null);
             application.sendEventCollectionUser(mTracker, SoupContract.PAGE_VIEW,SoupContract.COLLECTION_VIEWED,
-                    SoupContract.COLLECTION_PAGE,SoupContract.FB_ID,name,StoryId,StoryTitle);
+                    SoupContract.COLLECTION_PAGE,StoryId,StoryTitle,pref.getString(SoupContract.FB_ID,null),
+                    pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null));
         }else {
 
             application.sendEventCollection(mTracker, SoupContract.PAGE_VIEW, SoupContract.COLLECTION_VIEWED, SoupContract.COLLECTION_PAGE,StoryId,StoryTitle);
@@ -234,7 +240,7 @@ public class DetailsActivity extends AppCompatActivity {
 
     public void DetailsActivitydemo(String mfollowStatus){
         followStatus = mfollowStatus;
-        nSingleStoryAdapter.refreshData(followStatus);
+        nSingleStoryAdapter.refreshFollowStatus(followStatus);
 
 
     }
@@ -243,5 +249,11 @@ public class DetailsActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
     }
 }

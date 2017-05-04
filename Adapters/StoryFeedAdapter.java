@@ -33,6 +33,7 @@ import in.thesoup.thesoup.Application.AnalyticsApplication;
 import in.thesoup.thesoup.GSONclasses.FeedGSON.StoryData;
 import in.thesoup.thesoup.NetworkCalls.NetworkUtilsFollowUnFollow;
 import in.thesoup.thesoup.R;
+import in.thesoup.thesoup.SoupContract;
 
 import static android.text.Html.fromHtml;
 import static com.google.gson.internal.bind.util.ISO8601Utils.format;
@@ -46,7 +47,10 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
     private List<StoryData> StoryDataList;
     private Context context;
     private int clickposition;
-    private String clickStoryId;
+    private String clickStoryId,clickStoryName;
+    private AnalyticsApplication application;
+    private Tracker mTracker;
+    private SharedPreferences pref;
 
     public StoryFeedAdapter(List<StoryData> Datalist, Context context) {
         this.StoryDataList = Datalist;
@@ -103,21 +107,44 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
 
             int mposition = getAdapterPosition();
+            String Storyname = StoryDataList.get(mposition).getStoryName();
             String mfollowstatus = StoryDataList.get(mposition).getFollowStatus();
             String mString = StoryDataList.get(mposition).getStoryId();
 
+            application = AnalyticsApplication.getInstance();
+            mTracker = application.getDefaultTracker();
+            pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+
+
 
             if (view == imageView || view == storyTitle) {
+
+                if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
+
+                     application.sendEventCollection(mTracker,SoupContract.CLICK, SoupContract.CLICK_COLLECTION,SoupContract.HOME_PAGE,Storyname,mString);
+
+                }else{
+
+                    application.sendEventCollectionUser(mTracker,SoupContract.CLICK,SoupContract.CLICK_COLLECTION,SoupContract.HOME_PAGE
+                            ,Storyname,mString,pref.getString(SoupContract.FB_ID,null),
+                            pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null));
+
+                }
 
                 Intent intent = new Intent(context, DetailsActivity.class);
                 intent.putExtra("story_id", mString);
                 intent.putExtra("followstatus",mfollowstatus);
 
 
+
                 context.startActivity(intent);
+
+
             } else if (view == mButton) {
                 clickposition = mposition;
                 clickStoryId = mString;
+                clickStoryName = Storyname;
 
                 followstory();
             }
@@ -131,13 +158,18 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
         Log.d("follow worked", clickStoryId);
         String mfollowstatus = StoryDataList.get(clickposition).getFollowStatus();
-        
+
+
+
+
         if (mfollowstatus.equals("") || mfollowstatus.equals("0")) {
 
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
 
 
             if (TextUtils.isEmpty(pref.getString("auth_token", null))) {
+
+                application.sendEventCollection(mTracker,SoupContract.CLICK, SoupContract.CLICK_FOLLOW,SoupContract.HOME_PAGE,clickStoryName,String.valueOf(clickStoryId));
 
 
                 MainActivity activity = (MainActivity) context;
@@ -154,6 +186,10 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
                 params.put("auth_token", pref.getString("auth_token", null));
                 params.put("story_id", clickStoryId);
 
+                application.sendEventCollectionUser(mTracker,SoupContract.CLICK,SoupContract.CLICK_FOLLOW,SoupContract.HOME_PAGE
+                ,clickStoryName,String.valueOf(clickStoryId),pref.getString(SoupContract.FB_ID,null),
+                        pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null));
+
                 NetworkUtilsFollowUnFollow followrequest = new NetworkUtilsFollowUnFollow(context, params);
                 //followrequest.followRequest(clickposition);
 
@@ -161,9 +197,11 @@ public class StoryFeedAdapter extends RecyclerView.Adapter<StoryFeedAdapter.Data
 
 
             }
-
         } else if (mfollowstatus.equals("1")) {
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+            application.sendEventCollectionUser(mTracker,SoupContract.CLICK,SoupContract.CLICK_UNFOLLOW,SoupContract.HOME_PAGE
+                    ,clickStoryName,String.valueOf(clickStoryId),pref.getString(SoupContract.FB_ID,null),
+                    pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null));
 
             HashMap<String, String> params = new HashMap<>();
 

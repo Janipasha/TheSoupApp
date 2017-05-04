@@ -126,7 +126,8 @@ public class ArticlesActivity extends AppCompatActivity{
 
             String name = pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null);
             application.sendEventCollectionUser(mTracker, SoupContract.PAGE_VIEW,SoupContract.ARTICLES_VIEWED,
-                    SoupContract.ARTICLES_PAGE,SoupContract.FB_ID,name,StoryId,StoryTitle);
+                    SoupContract.ARTICLES_PAGE,StoryId,StoryTitle,pref.getString(SoupContract.FB_ID,null),
+                    pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null));
         }else {
 
             application.sendEventCollection(mTracker, SoupContract.PAGE_VIEW, SoupContract.ARTICLES_VIEWED, SoupContract.ARTICLES_PAGE,StoryId,StoryTitle);

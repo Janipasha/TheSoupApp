@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.Button;
 
 import com.facebook.FacebookSdk;
-import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import java.util.ArrayList;
@@ -125,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     public void loadNextDataFromApi(int offset) {
 
         String Page = String.valueOf(offset);
@@ -166,6 +166,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        finish();
+        startActivity(getIntent());
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         application.sendScreenName(mTracker, SoupContract.DISCOVER_VIEWED);
@@ -176,7 +184,8 @@ public class MainActivity extends AppCompatActivity {
 
             String name = pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null);
             application.sendEventUser(mTracker, SoupContract.PAGE_VIEW,SoupContract.DISCOVER_VIEWED,
-                    SoupContract.HOME_PAGE,SoupContract.FB_ID,name);
+                    SoupContract.HOME_PAGE,pref.getString(SoupContract.FB_ID,null),
+                    pref.getString(SoupContract.FIRSTNAME,null)+pref.getString(SoupContract.LASTNAME,null));
         }else {
 
             application.sendEvent(mTracker, SoupContract.PAGE_VIEW, SoupContract.DISCOVER_VIEWED, SoupContract.HOME_PAGE);

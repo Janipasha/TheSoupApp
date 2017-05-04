@@ -35,6 +35,7 @@ public class gsonConversion {
     private List<StoryData> mListFromJson;
     private Substoryjsondata mSubstoryjsonData;
     private String StoryTitle , followstatus;
+    private List<Substories> mSubstories;
 
     public void fillUI(JSONObject jsonObject,Context context){
 
@@ -64,7 +65,9 @@ public class gsonConversion {
         }
     }
 
-    public void fillStoryUI(JSONObject jsonObject, List<Substories> substories, String StoryTitle, String followstatus, Context context){
+    public void fillStoryUI(JSONObject jsonObject, Context context){
+
+        mSubstories = new ArrayList<>();
 
         mJsonObject = jsonObject;
 
@@ -72,19 +75,18 @@ public class gsonConversion {
         GetSingleStory redstory = gson.fromJson(jsonObject.toString(),GetSingleStory.class);
 
         StoryTitle = redstory.getdata().getStoryName();
-        followstatus = redstory.getdata().getfollowStatus();
 
        for(int i=0;i<redstory.getdata().getSubstories().size();i++){
 
-            substories.add(redstory.getdata().getSubstories().get(i));
+           mSubstories.add(redstory.getdata().getSubstories().get(i));
         }
 
-        Log.d("substories",substories.toString());
+        Log.d("substories",mSubstories.toString());
 
 
         DetailsActivity activity = (DetailsActivity) context;
 
-        activity.startAdapter(substories,StoryTitle);
+        activity.startAdapter(mSubstories,StoryTitle);
 
       //mSingleStoryAdapter.refreshData(substories,StoryTitle,followstatus);
 
