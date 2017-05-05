@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
       application = (AnalyticsApplication) getApplication();
         mTracker = application.getDefaultTracker();
 
-        SendActivityInfoToGA();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -263,9 +262,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void SendActivityInfoToGA(){
 
-    }
 
 
 }

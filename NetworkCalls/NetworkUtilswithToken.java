@@ -112,9 +112,11 @@ public class NetworkUtilswithToken {
                                 if(networkResponse.statusCode ==404){
                                     if (mcontext instanceof feedActivity) {
                                         if (params.get("page").equals("0")) {
-                                            Intent intent = new Intent(mcontext, feedActivity.class);
+                                           /* Intent intent = new Intent(mcontext, feedActivity.class);
                                             intent.putExtra("following stories", "0");
-                                            mcontext.startActivity(intent);
+                                            ((feedActivity) mcontext).startActivityForResult(intent,36);*/
+
+                                            ((feedActivity) mcontext).Nofollowers();
                                         }
 
                                     }

@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -105,14 +106,6 @@ public class feedActivity extends AppCompatActivity {
 
         StoryView.setHasFixedSize(true);
 
-        if (intent1.hasExtra("following stories")) {
-            StoryView.setVisibility(View.GONE);
-
-            TextView mTextView = (TextView) findViewById(R.id.empty_view);
-            mTextView.setText("You have not followed any SOUPS yet\n");
-
-        } else {
-
 
             params.put("auth_token", pref.getString("auth_token", null));
             params.put("myfeed", "1"); // 1 is the value required for getting myfeed
@@ -124,8 +117,31 @@ public class feedActivity extends AppCompatActivity {
 
 
             networkutilsToken.getFeed();
+
+
+    }
+
+
+    public void Nofollowers(){
+
+        StoryView.setVisibility(View.GONE);
+
+        TextView mTextView = (TextView) findViewById(R.id.empty_view);
+        mTextView.setText("You have not followed any SOUPS yet\n");
+
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            // do something on back.
+            Intent intent = new Intent(this,MainActivity.class);
+            startActivity(intent);
+
+            return true;
         }
 
+        return super.onKeyDown(keyCode, event);
     }
 
 
@@ -211,13 +227,6 @@ public class feedActivity extends AppCompatActivity {
             mStoryfeedAdapter.followstory();
 
         }
-    }
-
-    public void demo(String storyId) {
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.putExtra("story_id", storyId);
-        intent.putExtra("activity", "0");
-        startActivityForResult(intent, 35);
     }
 
     public void demo1(int position, String followstatus) {

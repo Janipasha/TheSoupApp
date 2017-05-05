@@ -16,13 +16,14 @@ public class Substories {
     String top_article_image;
     String top_article_title;
     List<Articles> articles;
+    String top_article_date;
 
     public String getSubstoryId(){
         return substory_id;
     }
 
     public  String getTime(){
-       return substory_created;
+       return top_article_date;
     }
 
     public  String  getSubstoryName(){
